@@ -46,20 +46,28 @@ class ContentRoutes {
 class CategoryRoutes {
   const CategoryRoutes();
 
-  final String base = '/api/categories';
+  final String categories = '/api/categories';
 }
 
 class ProductRoutes {
   const ProductRoutes();
 
-  final String all = '/api/products/all';
-  final String byLabel = '/api/products/label';
-  final String search = '/api/products/search';
-  final String byCategory = '/api/products/category';
+  String all({int page = 1, int limit = 10}) =>
+      '/api/products/all?page=$page&limit=$limit';
 
-  String details(String id) => '/api/products/$id';
-  String recommended(String productId) =>
-      '/api/products/$productId/recommended';
+  String byLabel({required String label, int page = 1, int limit = 10}) =>
+      '/api/products/label?label=$label&page=$page&limit=$limit';
+
+  String byCategory({required int categoryId, int page = 1, int limit = 10}) =>
+      '/api/products/category?categoryId=$categoryId&page=$page&limit=$limit';
+
+  String search({required String query, int page = 1, int limit = 10}) =>
+      '/api/products/search?q=$query&page=$page&limit=$limit';
+
+  String byId(int id) => '/api/products/$id';
+
+  String recommended(int productId, {int page = 1, int limit = 10}) =>
+      '/api/products/$productId/recommended?page=$page&limit=$limit';
 }
 
 class CartRoutes {
