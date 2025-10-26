@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get_utils/src/extensions/export.dart';
 import 'package:sairon/core/widgets/error_widget.dart';
 import 'package:sairon/core/widgets/loading_indicator.dart';
 import 'package:sairon/features/category/domain/usecases/category_usecases.dart';
@@ -12,6 +13,7 @@ import 'package:sairon/features/slider/domain/usecases/slider_usecases.dart';
 import 'package:sairon/features/slider/presentation/widgets/slider.dart';
 import '../../../category/data/repositories/category_repository_impl.dart';
 import '../../../slider/data/repositories/slider_repository_impl.dart';
+import '../widgets/appbar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,6 +21,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const GradientHeader(),
       body: BlocProvider(
         create: (context) => HomeBloc(
           categoryUseCases: CategoryUseCases(repository: categoryRepository),
@@ -43,7 +46,9 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     switch (index) {
                       case 0:
-                        return BannerSlider(banners: state.banners);
+                        return BannerSlider(
+                          banners: state.banners,
+                        ).marginAll(16);
                       case 1:
                         return ProductHorizontalList(
                           title: 'پرتخفیف‌ها',

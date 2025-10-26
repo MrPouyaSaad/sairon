@@ -20,6 +20,7 @@ class AppListTitle extends StatelessWidget {
           border: Border(
             bottom: BorderSide(
               width: 1.5,
+
               color: Theme.of(context).colorScheme.secondary,
             ),
           ),

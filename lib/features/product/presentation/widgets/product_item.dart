@@ -5,6 +5,7 @@ import 'package:sairon/core/constants/app_constants.dart';
 import 'package:sairon/core/themes/app_colors.dart';
 import 'package:sairon/core/themes/text_styles.dart';
 import 'package:sairon/core/utils/extensions.dart';
+import 'package:sairon/core/widgets/gradient.dart';
 import 'package:sairon/core/widgets/image_loading.dart';
 import 'package:sairon/features/product/domain/entities/product_entity.dart';
 
@@ -55,11 +56,7 @@ class ProductItem extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [AppColors.errorColor, Color(0xFFFF6B6B)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          gradient: GradientTheme.primaryGradient,
                           borderRadius: BorderRadius.only(
                             bottomLeft: Radius.circular(
                               Constants.primaryRadiusValue,
