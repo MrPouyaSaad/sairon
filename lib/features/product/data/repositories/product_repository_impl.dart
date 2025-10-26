@@ -4,7 +4,11 @@ import 'package:sairon/features/product/data/datasources/product_remote_data_sou
 import 'package:sairon/features/product/data/models/product_model.dart';
 import 'package:sairon/features/product/domain/repositories/product_repository.dart';
 
+import '../../../../core/constants/api/api_constants.dart';
 import '../../../../core/errors/exception_mapper.dart';
+
+final dataSource = ProductRemoteDataSourceImpl(ApiConstants.httpClient);
+final productRepository = ProductRepositoryImpl(dataSource);
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource dataSource;

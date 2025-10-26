@@ -14,7 +14,7 @@ abstract class ProductRemoteDataSource {
 class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   final Dio httpClient;
 
-  ProductRemoteDataSourceImpl({required this.httpClient});
+  ProductRemoteDataSourceImpl(this.httpClient);
 
   @override
   Future<ProductModel> fetchProductById(int id) async {

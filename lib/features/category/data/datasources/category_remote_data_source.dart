@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:sairon/core/constants/api/app_routes.dart';
 import 'package:sairon/core/errors/exception_mapper.dart';
-import 'package:sairon/data/models/category_model.dart';
+import 'package:sairon/features/category/data/models/category_model.dart';
 
-import '../../core/errors/exceptions.dart';
+import '../../../../core/errors/exceptions.dart';
 
 class CategoryRemoteDataSource {
   final Dio httpClient;
 
-  CategoryRemoteDataSource({required this.httpClient});
+  CategoryRemoteDataSource(this.httpClient);
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {

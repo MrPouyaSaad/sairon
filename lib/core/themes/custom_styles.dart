@@ -33,6 +33,7 @@ class AppCustomStyles {
   static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
     backgroundColor: AppColors.primaryColor,
     foregroundColor: Colors.white,
+
     elevation: 0,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

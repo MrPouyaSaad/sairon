@@ -13,14 +13,14 @@ class HomeLoaded extends HomeState {
   final List<ProductEntity> topProducts;
   final List<ProductEntity> newArrivals;
   final List<ProductEntity> bestSellers;
-  // final List<CategoryEntity> categories;
+  final List<CategoryEntity> categories;
   // final List<BannerEntity> banners;
 
   const HomeLoaded({
     this.topProducts = const [],
     this.newArrivals = const [],
     this.bestSellers = const [],
-    // this.categories = const [],
+    this.categories = const [],
     // this.banners = const [],
   });
 
