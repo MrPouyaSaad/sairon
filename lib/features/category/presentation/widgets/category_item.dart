@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:sairon/core/constants/app_constants.dart';
 import 'package:sairon/core/themes/text_styles.dart';
 import 'package:sairon/core/widgets/image_loading.dart';
@@ -22,6 +23,7 @@ class CategoryItem extends StatelessWidget {
               borderRadius: Constants.primaryRadius,
             ),
           ),
+          Gap(16),
           Text(categoryEntity.name, style: AppTextStyles.sectionTitle),
         ],
       ),
