@@ -46,14 +46,14 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     switch (index) {
                       case 0:
-                        return BannerSlider(
-                          banners: state.banners,
-                        ).marginAll(16);
-                      case 1:
                         return ProductHorizontalList(
                           title: 'پرتخفیف‌ها',
                           products: state.topProducts,
-                        );
+                        ).marginOnly(top: 16);
+                      case 1:
+                        return BannerSlider(
+                          banners: state.banners,
+                        ).marginAll(16);
 
                       case 2:
                         return CategoryList(categoryList: state.categories);

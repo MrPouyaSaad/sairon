@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sairon/core/themes/app_theme.dart';
 import 'package:sairon/features/home/presentation/pages/home.dart';
+import 'package:sairon/features/root/presentation/pages/root.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return Directionality(textDirection: TextDirection.rtl, child: child!);
       },
-      home: HomeScreen(),
+      home: RootScreen(),
     );
   }
 }
