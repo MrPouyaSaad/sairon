@@ -15,13 +15,13 @@ class CategoryList extends StatelessWidget {
         AppListTitle(title: 'دسته‌بندی'),
         GridView.builder(
           shrinkWrap: true,
-          physics:
-              const NeverScrollableScrollPhysics(), // غیرفعال کردن اسکرول داخلی
+
+          physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, // تعداد ستون‌ها
-            crossAxisSpacing: 8.0, // فاصله افقی
-            mainAxisSpacing: 8.0, // فاصله عمودی
-            childAspectRatio: 0.8, // نسبت عرض به ارتفاع هر آیتم
+            crossAxisCount: 3,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 0.9,
           ),
           itemCount: categoryList.length,
           itemBuilder: (context, index) {

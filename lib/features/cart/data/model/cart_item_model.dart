@@ -8,6 +8,6 @@ class CartItemModel extends CartItemEntity {
         id: json['id'],
         productEntity: ProductModel.fromJson(json['product']),
         quantity: json['quantity'],
-        totalPrice: json['total_price'].toDouble(),
+        totalPrice: json['item_Total'].toDouble(),
       );
 }

@@ -11,14 +11,14 @@ class HomeLoading extends HomeState {}
 
 class HomeLoaded extends HomeState {
   final List<ProductEntity> topProducts;
-  final List<ProductEntity> newArrivals;
+  final List<ProductEntity> recommendedProducts;
   final List<ProductEntity> bestSellers;
   final List<CategoryEntity> categories;
   final List<SliderEntity> banners;
 
   const HomeLoaded({
     this.topProducts = const [],
-    this.newArrivals = const [],
+    this.recommendedProducts = const [],
     this.bestSellers = const [],
     this.categories = const [],
     this.banners = const [],
@@ -27,7 +27,7 @@ class HomeLoaded extends HomeState {
   @override
   List<Object?> get props => [
     topProducts,
-    newArrivals,
+    recommendedProducts,
     bestSellers,
     // categories,
     // banners,

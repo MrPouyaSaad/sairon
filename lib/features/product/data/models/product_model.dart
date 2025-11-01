@@ -1,5 +1,8 @@
+import '../../../category/data/models/category_model.dart';
 import '../../domain/entities/product_entity.dart';
 import '../../domain/entities/product_images.dart';
+import 'attributes_model.dart';
+import 'variant_model.dart';
 
 class ProductModel extends ProductEntity {
   ProductModel.fromJson(Map<String, dynamic> json)
@@ -17,6 +20,24 @@ class ProductModel extends ProductEntity {
           (json['discount_type'] as String?) ?? 'percent',
         ),
         images: ProductImages.fromJson(json['images']),
+        image: json['image'] as String,
+        category: CategoryModel.fromJson(json['category']),
+        attributes:
+            (json['attributes'] as List<dynamic>?)
+                ?.map(
+                  (e) =>
+                      ProductAttributeModel.fromJson(e as Map<String, dynamic>),
+                )
+                .toList() ??
+            [],
+        variants:
+            (json['variants'] as List<dynamic>?)
+                ?.map(
+                  (e) =>
+                      ProductVariantModel.fromJson(e as Map<String, dynamic>),
+                )
+                .toList() ??
+            [],
       );
 
   static String _calculateDiscountedPrice(

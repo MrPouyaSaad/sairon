@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sairon/features/cart/presentation/pages/cart_page.dart';
 import '../../../home/presentation/pages/home.dart';
 import '../bloc/root_bloc.dart';
 
@@ -43,14 +44,11 @@ class RootScreen extends StatelessWidget {
               body: IndexedStack(
                 index: state.selectedIndex,
                 children: [
-                  _buildNavigator(keys[0], const HomeScreen()),
-                  _buildNavigator(
-                    keys[1],
-                    const HomeScreen(),
-                  ), // جایگزین با CartScreen
+                  _buildNavigator(keys[0], HomeScreen()),
+                  _buildNavigator(keys[1], CartPage()), // جایگزین با CartScreen
                   _buildNavigator(
                     keys[2],
-                    const HomeScreen(),
+                    HomeScreen(),
                   ), // جایگزین با ProfileScreen
                 ],
               ),

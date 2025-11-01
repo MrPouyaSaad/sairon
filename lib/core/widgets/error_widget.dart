@@ -22,7 +22,11 @@ class AppErrorWidget extends StatelessWidget {
           children: [
             Icon(Icons.error, size: 64, color: AppColors.textSecondary),
             Gap(24),
-            Text(message, style: AppTextStyles.errorText),
+            Text(
+              message,
+              style: AppTextStyles.errorText,
+              textAlign: TextAlign.center,
+            ),
             Gap(24),
             CustomButton(title: 'تلاش مجدد', onPressed: onRetry),
           ],

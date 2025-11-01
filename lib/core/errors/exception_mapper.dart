@@ -100,6 +100,7 @@ Future<Either<Failure, T>> safeCall<T>(Future<T> Function() call) async {
     return Right(result);
   } on DioException catch (error) {
     final exception = mapDioError(error);
+
     return Left(mapExceptionToFailure(exception));
   } on Exception catch (error) {
     return Left(mapExceptionToFailure(error));

@@ -5,6 +5,6 @@ class CategoryModel extends CategoryEntity {
     : super(
         id: json['id'] as int,
         name: json['name'] as String,
-        imageUrl: json['image'] as String,
+        imageUrl: json['image'] ?? '',
       );
 }

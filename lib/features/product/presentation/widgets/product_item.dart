@@ -19,7 +19,8 @@ class ProductItem extends StatelessWidget {
     return GestureDetector(
       onTap: () {},
       child: Container(
-        height: 300,
+        height: 310,
+        width: picSize + 30,
         margin: EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: Constants.primaryRadius,
@@ -85,14 +86,14 @@ class ProductItem extends StatelessWidget {
                     ),
               ],
             ),
-            Gap(18),
+            Gap(14),
             Text(
               productEntity.name,
               style: AppTextStyles.bodyLarge,
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
             ).marginSymmetric(horizontal: 8),
-            Gap(8),
+            Gap(6),
             Text(
               (productEntity.orginalPrice).formattedStringPrice,
               style: AppTextStyles.caption.copyWith(
@@ -109,7 +110,7 @@ class ProductItem extends StatelessWidget {
                     .withPriceLable,
                 style: AppTextStyles.bodyLarge,
               ),
-            ).marginOnly(top: 2, left: 8, right: 8),
+            ).marginOnly(top: 2, left: 8, right: 8, bottom: 4),
           ],
         ),
       ),

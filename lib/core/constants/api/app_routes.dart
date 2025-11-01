@@ -73,7 +73,7 @@ class ProductRoutes {
 class CartRoutes {
   const CartRoutes();
 
-  final String base = '/api/cart';
+  final String getCart = '/api/cart';
   final String add = '/api/cart/add';
   final String update = '/api/cart/update';
   final String clear = '/api/cart/clear';
