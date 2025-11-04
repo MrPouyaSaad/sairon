@@ -8,6 +8,7 @@ import 'package:sairon/core/utils/extensions.dart';
 import 'package:sairon/core/widgets/gradient.dart';
 import 'package:sairon/core/widgets/image_loading.dart';
 import 'package:sairon/features/product/domain/entities/product_entity.dart';
+import 'package:sairon/features/product/presentation/pages/product_details.dart';
 
 class ProductItem extends StatelessWidget {
   const ProductItem({super.key, required this.productEntity});
@@ -17,7 +18,9 @@ class ProductItem extends StatelessWidget {
     final isDiscounted = double.parse(productEntity.discount) > 0;
     final picSize = MediaQuery.of(context).size.width / 2.5;
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Get.to(ProductDetails(productEntity: productEntity));
+      },
       child: Container(
         height: 310,
         width: picSize + 30,
@@ -43,7 +46,7 @@ class ProductItem extends StatelessWidget {
                   width: picSize,
                   height: picSize,
                   child: ImageLoadingService(
-                    imageUrl: productEntity.images.images.first,
+                    imageUrl: productEntity.images.urls.first,
                   ),
                 ).marginAll(12),
                 if (isDiscounted)

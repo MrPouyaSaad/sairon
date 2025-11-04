@@ -1,5 +1,5 @@
 class ProductImages {
-  final List<String> images;
+  final List<String> urls;
   ProductImages.fromJson(List<dynamic> json)
-    : images = json.map((e) => e['url'] as String).toList();
+    : urls = json.map((e) => e['url'] as String).toList();
 }
