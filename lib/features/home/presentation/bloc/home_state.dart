@@ -29,8 +29,8 @@ class HomeLoaded extends HomeState {
     topProducts,
     recommendedProducts,
     bestSellers,
-    // categories,
-    // banners,
+    categories,
+    banners,
   ];
 }
 

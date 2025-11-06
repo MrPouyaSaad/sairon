@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../../features/auth/data/repositories/token_repo.dart';
+
 class ApiConstants {
   static const String baseUrl = 'https://api.saironstore.ir';
 
@@ -7,11 +9,11 @@ class ApiConstants {
     ..interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // final authInfo = AuthRepository.authNotifier.value;
-          // if (authInfo != null) {
-          //   options.headers['Authorization'] = 'Bearer $authInfo';
-          //   // options.headers['Content-Type'] = 'application / json';
-          // }
+          final token = TokenRepository.currentToken;
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          options.headers['Content-Type'] = 'application/json';
           handler.next(options);
         },
       ),

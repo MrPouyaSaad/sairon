@@ -60,8 +60,7 @@ class ServerException extends AppException {
 
 /// Exception for no internet or connection timeout.
 class NetworkException extends AppException {
-  NetworkException([String message = 'اتصال به اینترنت برقرار نیست'])
-    : super(message);
+  NetworkException([super.message = 'اتصال به اینترنت برقرار نیست']);
 
   @override
   String toString() => 'NetworkException: $message';
@@ -69,8 +68,7 @@ class NetworkException extends AppException {
 
 /// Exception for invalid or unexpected data (client-side).
 class ValidationException extends AppException {
-  ValidationException([String message = 'داده‌های وارد شده نامعتبر است'])
-    : super(message);
+  ValidationException([super.message = 'داده‌های وارد شده نامعتبر است']);
 
   @override
   String toString() => 'ValidationException: $message';
@@ -78,8 +76,7 @@ class ValidationException extends AppException {
 
 /// Exception for any unhandled or unknown error.
 class UnknownException extends AppException {
-  UnknownException([String message = 'خطای ناشناخته‌ای رخ داده است'])
-    : super(message);
+  UnknownException([super.message = 'خطای ناشناخته‌ای رخ داده است']);
 
   @override
   String toString() => 'UnknownException: $message';

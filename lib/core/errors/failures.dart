@@ -8,23 +8,20 @@ abstract class Failure {
 /// Failure for server-side (HTTP) errors.
 class ServerFailure extends Failure {
   final int? statusCode;
-  const ServerFailure(String message, {this.statusCode}) : super(message);
+  const ServerFailure(super.message, {this.statusCode});
 }
 
 /// Failure for no internet or timeout.
 class NetworkFailure extends Failure {
-  const NetworkFailure([String message = 'اتصال به اینترنت برقرار نیست'])
-    : super(message);
+  const NetworkFailure([super.message = 'اتصال به اینترنت برقرار نیست']);
 }
 
 /// Failure for invalid or malformed data.
 class ValidationFailure extends Failure {
-  const ValidationFailure([String message = 'داده‌های وارد شده نامعتبر است'])
-    : super(message);
+  const ValidationFailure([super.message = 'داده‌های وارد شده نامعتبر است']);
 }
 
 /// Failure for unknown or unexpected issues.
 class UnknownFailure extends Failure {
-  const UnknownFailure([String message = 'خطای غیرمنتظره‌ای رخ داده است'])
-    : super(message);
+  const UnknownFailure([super.message = 'خطای غیرمنتظره‌ای رخ داده است']);
 }

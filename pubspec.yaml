@@ -45,6 +45,7 @@ dependencies:
   smooth_page_indicator: ^1.2.1
   iconsax: ^0.0.8
   photo_view: ^0.15.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

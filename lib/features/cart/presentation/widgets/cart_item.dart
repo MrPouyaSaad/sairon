@@ -6,7 +6,6 @@ import 'package:sairon/core/constants/app_constants.dart';
 import 'package:sairon/core/themes/app_colors.dart';
 import 'package:sairon/core/utils/extensions.dart';
 import 'package:sairon/core/widgets/image_loading.dart';
-import 'package:sairon/features/cart/domain/entities/cart_item.dart';
 
 class CartItem extends StatelessWidget {
   const CartItem({super.key});
