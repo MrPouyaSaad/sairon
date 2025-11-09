@@ -20,7 +20,7 @@ class ProductModel extends ProductEntity {
           (json['discount_type'] as String?) ?? 'percent',
         ),
         images: ProductImages.fromJson(json['images']),
-        image: json['image'] as String,
+        image: json['image'] ?? '',
         category: CategoryModel.fromJson(json['category']),
         attributes:
             (json['attributes'] as List<dynamic>?)

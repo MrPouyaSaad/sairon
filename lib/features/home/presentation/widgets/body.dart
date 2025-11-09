@@ -20,7 +20,7 @@ class HomeBody extends StatelessWidget {
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
             if (state is HomeLoading) {
-              return const LoadingIndicator();
+              return const ScreenLoadingIndicator();
             } else if (state is HomeError) {
               return AppErrorWidget(
                 message: state.message,

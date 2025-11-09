@@ -3,9 +3,12 @@ import 'package:get/get.dart';
 import 'package:sairon/core/themes/app_theme.dart';
 import 'package:sairon/features/root/presentation/pages/root.dart';
 
-void main() {
+import 'features/auth/data/repositories/token_repo.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  await TokenRepository.loadToken();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

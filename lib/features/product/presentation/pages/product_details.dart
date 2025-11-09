@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:sairon/core/constants/app_constants.dart';
 import 'package:sairon/core/themes/app_colors.dart';
 import 'package:sairon/core/utils/extensions.dart';
+import 'package:sairon/core/widgets/gradient.dart';
 import 'package:sairon/features/product/domain/entities/product_entity.dart';
 import 'package:sairon/features/product/presentation/widgets/recommended_products.dart';
 
@@ -47,6 +48,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 children: [
                   ProductMainImage(productEntity: widget.productEntity),
                   AppBarBackButton(),
+                  DiscountLabel(discount: widget.productEntity.discount),
                 ],
               ),
               Gap(8),
@@ -55,12 +57,13 @@ class _ProductDetailsState extends State<ProductDetails> {
               ProductInfo(productEntity: widget.productEntity),
               Gap(24),
               RecommendedProducts(id: widget.productEntity.id),
+              Gap(64),
             ],
           ),
         ),
       ),
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (child, anim) =>
@@ -178,6 +181,7 @@ class AppBarBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Positioned(
       right: 24,
+      top: 8,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -191,6 +195,39 @@ class AppBarBackButton extends StatelessWidget {
           ],
         ),
         child: BackButton(),
+      ),
+    );
+  }
+}
+
+class DiscountLabel extends StatelessWidget {
+  const DiscountLabel({super.key, required this.discount});
+  final String discount;
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 24,
+      top: 12,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        decoration: BoxDecoration(
+          gradient: GradientTheme.primaryGradient,
+          borderRadius: Constants.primaryRadius,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.deepPurple.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Text(
+          '$discount تخفیف',
+          style: TextStyle(
+            color: AppColors.backgroundColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }

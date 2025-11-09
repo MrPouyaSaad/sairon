@@ -1,13 +1,13 @@
 class CartTotalEntity {
-  final int discount;
-  final int shippingCost;
   final int subTotal;
+  final int shipping;
+  final int tax;
   final int total;
 
   CartTotalEntity({
-    required this.discount,
-    required this.shippingCost,
     required this.subTotal,
+    required this.shipping,
+    required this.tax,
     required this.total,
   });
 }

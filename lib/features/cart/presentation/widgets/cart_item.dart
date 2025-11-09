@@ -7,11 +7,51 @@ import 'package:sairon/core/themes/app_colors.dart';
 import 'package:sairon/core/utils/extensions.dart';
 import 'package:sairon/core/widgets/image_loading.dart';
 
-class CartItem extends StatelessWidget {
-  const CartItem({super.key});
-  // final CartItemEntity cart;
+import '../../domain/entities/cart_item.dart';
+
+class CartItemWidget extends StatelessWidget {
+  const CartItemWidget({super.key, required this.item});
+  final CartItemEntity item;
+
+  String? _getProductImage() {
+    if (item.product.images.urls.isNotEmpty) {
+      return item.product.images.urls.first;
+    }
+    return item.product.image.isNotEmpty ? item.product.image : null;
+  }
+
+  String? _getVariantAttribute() {
+    if (item.variant != null && item.variant!.attributes.isNotEmpty) {
+      return item.variant!.attributes.values.first;
+    }
+    return null;
+  }
+
+  int _getOriginalPrice() {
+    if (item.variant != null) {
+      return int.tryParse(item.variant!.price) ?? 0;
+    }
+    return int.tryParse(item.product.orginalPrice) ?? 0;
+  }
+
+  int _getDiscountedPrice() {
+    return item.currentPrice;
+  }
+
+  bool _hasDiscount() {
+    final originalPrice = _getOriginalPrice();
+    final discountedPrice = _getDiscountedPrice();
+    return discountedPrice < originalPrice;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final originalPrice = _getOriginalPrice();
+    final discountedPrice = _getDiscountedPrice();
+    final hasDiscount = _hasDiscount();
+    final variantAttribute = _getVariantAttribute();
+    final productImage = _getProductImage();
+
     return Container(
       decoration: BoxDecoration(borderRadius: Constants.primaryRadius),
       child: Column(
@@ -26,54 +66,70 @@ class CartItem extends StatelessWidget {
                   borderRadius: Constants.primaryRadius,
                   color: AppColors.primaryColor.withOpacity(0.25),
                 ),
-                child: ImageLoadingService(
-                  borderRadius: Constants.primaryRadius,
-                  imageUrl:
-                      'https://dkstatics-public.digikala.com/digikala-products/b9965d7e124d19605c5f78ad9b4759edfecda60d_1686128724.jpg?x-oss-process=image/resize,m_lfit,h_800,w_800/quality,q_90',
-                ),
+                child: productImage != null
+                    ? ImageLoadingService(
+                        borderRadius: Constants.primaryRadius,
+                        imageUrl: productImage,
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          borderRadius: Constants.primaryRadius,
+                          color: Colors.grey[300],
+                        ),
+                        child: Icon(
+                          Iconsax.shopping_cart,
+                          color: Colors.grey[600],
+                          size: 24,
+                        ),
+                      ),
               ),
               Gap(12),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'هولدر',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      wordSpacing: -1,
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.product.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        wordSpacing: -1,
+                        fontSize: 16,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Gap(4),
-                  Row(
-                    children: [
-                      Text.rich(
-                        TextSpan(
-                          text: 'رنگ: ',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            wordSpacing: -1,
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                          ),
-                          children: [
+                    Gap(4),
+                    if (variantAttribute != null)
+                      Row(
+                        children: [
+                          Text.rich(
                             TextSpan(
-                              text: 'مشکی',
+                              text: '${item.variant!.attributes.keys.first}: ',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 wordSpacing: -1,
                                 fontSize: 12,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textSecondary,
                               ),
+                              children: [
+                                TextSpan(
+                                  text: variantAttribute,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    wordSpacing: -1,
+                                    fontSize: 12,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
@@ -96,11 +152,9 @@ class CartItem extends StatelessWidget {
                       size: 22,
                     ),
                   ),
-
                   Gap(16),
-
                   Text(
-                    '2',
+                    item.quantity.toString(),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -117,23 +171,28 @@ class CartItem extends StatelessWidget {
                   ),
                 ],
               ),
-
               Row(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (10 > 0)
+                  if (hasDiscount)
                     Text(
-                      '290000'.formattedStringPrice,
+                      (originalPrice * item.quantity)
+                          .toString()
+                          .formattedStringPrice,
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
+                        decorationColor: AppColors.textSecondary,
                         decoration: TextDecoration.lineThrough,
                       ),
                     ),
-                  Gap(8),
+                  if (hasDiscount) Gap(8),
                   Text(
-                    '250000'.formattedStringPrice.withPriceLable,
+                    (discountedPrice * item.quantity)
+                        .toString()
+                        .formattedStringPrice
+                        .withPriceLable,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

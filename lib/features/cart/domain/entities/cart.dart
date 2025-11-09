@@ -1,15 +1,19 @@
-import 'package:sairon/features/cart/domain/entities/total.dart';
+import 'cart_item.dart';
+import 'shipping_info.dart';
+import 'total.dart';
 
 class CartEntity {
-  final String id;
-  final List<CartEntity> items;
+  final String cartId;
+  final int totalQuantity;
+  final List<CartItemEntity> items;
   final CartTotalEntity total;
-  final int itemCount;
+  final ShippingInfoEntity shippingInfo;
 
   CartEntity({
-    required this.id,
-    required this.itemCount,
+    required this.cartId,
     required this.items,
     required this.total,
+    required this.totalQuantity,
+    required this.shippingInfo,
   });
 }

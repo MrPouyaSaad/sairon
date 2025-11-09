@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sairon/features/cart/presentation/pages/cart_page.dart';
+import 'package:sairon/features/cart/presentation/pages/cart_flow.dart';
 import '../../../home/presentation/pages/home.dart';
 import '../bloc/root_bloc.dart';
 
@@ -45,11 +45,8 @@ class RootScreen extends StatelessWidget {
                 index: state.selectedIndex,
                 children: [
                   _buildNavigator(keys[0], HomeScreen()),
-                  _buildNavigator(keys[1], CartPage()), // جایگزین با CartScreen
-                  _buildNavigator(
-                    keys[2],
-                    HomeScreen(),
-                  ), // جایگزین با ProfileScreen
+                  _buildNavigator(keys[1], CartFlowScreen()),
+                  _buildNavigator(keys[2], HomeScreen()),
                 ],
               ),
               bottomNavigationBar: BottomNavigationBar(
@@ -60,8 +57,9 @@ class RootScreen extends StatelessWidget {
                 ),
 
                 currentIndex: state.selectedIndex,
-                onTap: (index) =>
-                    context.read<RootBloc>().add(ChangeTab(index)),
+                onTap: (index) {
+                  context.read<RootBloc>().add(ChangeTab(index));
+                },
                 items: const [
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),

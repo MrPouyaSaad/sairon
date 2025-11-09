@@ -21,7 +21,7 @@ class RecommendedProducts extends StatelessWidget {
           return BlocBuilder<RecommendedProductBloc, ProductState>(
             builder: (context, state) {
               if (state is FetchRecommendedProductsLoading) {
-                return LoadingIndicator();
+                return ScreenLoadingIndicator();
               } else if (state is FetchRecommendedProductsError) {
                 return AppErrorWidget(
                   message: state.message,
@@ -32,10 +32,12 @@ class RecommendedProducts extends StatelessWidget {
                   },
                 );
               } else if (state is FetchRecommendedProductsSuccess) {
-                return ProductHorizontalList(
-                  title: 'محصولات پیشنهادی',
-                  products: state.products,
-                );
+                return state.products!.isEmpty
+                    ? SizedBox()
+                    : ProductHorizontalList(
+                        title: 'محصولات پیشنهادی',
+                        products: state.products,
+                      );
               } else {
                 throw 'مشکلی در بارگیری صفحه پیش آمد!';
               }

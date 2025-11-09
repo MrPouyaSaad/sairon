@@ -1,11 +1,17 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
+import 'package:sairon/core/constants/api/api_constants.dart';
 import 'package:sairon/core/errors/exception_mapper.dart';
 import 'package:sairon/core/errors/failures.dart';
 import 'package:sairon/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:sairon/features/auth/domain/repositories/auth_repo.dart';
 
 import 'token_repo.dart';
+
+final dataSource = AuthRemoteDataSourceImpl(
+  httpClient: ApiConstants.httpClient,
+);
+final authRepository = AuthRepositoryImpl(dataSource: dataSource);
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource dataSource;
