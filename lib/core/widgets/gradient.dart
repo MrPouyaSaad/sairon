@@ -148,8 +148,16 @@ class GradientText extends StatelessWidget {
       child: Text(
         text,
         style:
-            style?.copyWith(color: Colors.white) ??
-            const TextStyle(color: Colors.white),
+            style?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ) ??
+            const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
         textAlign: textAlign,
       ),
     );

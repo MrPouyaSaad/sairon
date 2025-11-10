@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sairon/features/address/presentation/pages/address_page.dart';
+import 'package:sairon/features/profile/presentation/pages/user_info_page.dart';
 import 'package:sairon/features/profile/presentation/widgets/profile_header.dart';
 import 'package:sairon/features/profile/presentation/widgets/profile_menu_item.dart';
 
@@ -186,8 +187,18 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _editProfile() {
-    // TODO: Navigate to edit profile page
-    print('ویرایش پروفایل');
+    Get.to(
+      UserInfoPage(
+        user: UserModel(
+          id: 1,
+          phoneNumber: '09123456789',
+          nationalCode: '1234567890',
+          email: 'user@example.com',
+          firstName: 'علی',
+          lastName: 'محمدی',
+        ),
+      ),
+    );
   }
 
   void _navigateToAddresses() {
