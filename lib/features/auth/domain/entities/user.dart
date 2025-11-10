@@ -2,9 +2,9 @@ class UserEntity {
   final int id;
   final String phoneNumber;
   final String? nationalCode;
-  final String email;
-  final String firstName;
-  final String lastName;
+  final String? email;
+  final String? firstName;
+  final String? lastName;
 
   UserEntity({
     required this.id,

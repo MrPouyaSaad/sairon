@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sairon/features/address/presentation/pages/address_page.dart';
 import 'package:sairon/features/cart/presentation/pages/cart_flow.dart';
+import 'package:sairon/features/profile/presentation/pages/profile_page.dart';
 import '../../../home/presentation/pages/home.dart';
 import '../bloc/root_bloc.dart';
 
@@ -46,7 +48,7 @@ class RootScreen extends StatelessWidget {
                 children: [
                   _buildNavigator(keys[0], HomeScreen()),
                   _buildNavigator(keys[1], CartFlowScreen()),
-                  _buildNavigator(keys[2], HomeScreen()),
+                  _buildNavigator(keys[2], ProfilePage()),
                 ],
               ),
               bottomNavigationBar: BottomNavigationBar(

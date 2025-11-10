@@ -1,12 +1,23 @@
 import 'dart:convert';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 
 class ProvinceCitySelector extends StatefulWidget {
   final Function(Map<String, dynamic>?, Map<String, dynamic>?)? onChanged;
+  final Function(String)? onProvinceChanged;
+  final Function(String)? onCityChanged;
+  final String? selectedProvince;
+  final String? selectedCity;
 
-  const ProvinceCitySelector({super.key, this.onChanged});
+  const ProvinceCitySelector({
+    super.key,
+    this.onChanged,
+    this.onProvinceChanged,
+    this.onCityChanged,
+    this.selectedProvince,
+    this.selectedCity,
+  });
 
   @override
   State<ProvinceCitySelector> createState() => _ProvinceCitySelectorState();
@@ -23,6 +34,22 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
   void initState() {
     super.initState();
     _loadData();
+    _setInitialValues();
+  }
+
+  void _setInitialValues() {
+    if (widget.selectedProvince != null) {
+      _selectedProvince = _provinces.firstWhere(
+        (p) => p['name'] == widget.selectedProvince,
+        orElse: () => {},
+      );
+    }
+    if (widget.selectedCity != null) {
+      _selectedCity = _cities.firstWhere(
+        (c) => c['name'] == widget.selectedCity,
+        orElse: () => {},
+      );
+    }
   }
 
   Future<void> _loadData() async {
@@ -30,7 +57,10 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
       final provincesData = await rootBundle.loadString(
         'assets/data/ostan.json',
       );
+      debugPrint('loading data: $provincesData');
+
       final citiesData = await rootBundle.loadString('assets/data/shahr.json');
+      debugPrint('loading data: $citiesData');
 
       setState(() {
         _provinces = List<Map<String, dynamic>>.from(
@@ -53,6 +83,7 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
       _selectedCity = null;
     });
     widget.onChanged?.call(_selectedProvince, _selectedCity);
+    widget.onProvinceChanged?.call(province?['name'] ?? '');
   }
 
   void _onCityChanged(Map<String, dynamic>? city) {
@@ -60,6 +91,7 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
       _selectedCity = city;
     });
     widget.onChanged?.call(_selectedProvince, _selectedCity);
+    widget.onCityChanged?.call(city?['name'] ?? '');
   }
 
   @override
@@ -70,6 +102,7 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
           items: (filter, loadProps) => _provinces,
           itemAsString: (item) => item['name']?.toString() ?? '',
           selectedItem: _selectedProvince,
+          compareFn: (a, b) => a['id'] == b['id'],
           onChanged: _onProvinceChanged,
           popupProps: PopupProps.modalBottomSheet(
             showSearchBox: true,
@@ -82,24 +115,43 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
                 ),
               ),
             ),
-            title: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'انتخاب استان',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ),
+            // title: Padding(
+            //   padding: const EdgeInsets.all(16),
+            //   child: Text(
+            //     'انتخاب استان',
+            //     style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.grey.shade600,
+            //     ),
+            //   ),
+            // ),
           ),
           decoratorProps: DropDownDecoratorProps(
             decoration: InputDecoration(
-              labelText: 'استان',
+              label: Text.rich(
+                TextSpan(
+                  text: 'استان',
+                  children: [
+                    TextSpan(
+                      text: '  *',
+                      style: TextStyle(
+                        color: Colors.red[400],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              labelStyle: TextStyle(
+                color: Colors.grey.shade500,
+                fontWeight: FontWeight.bold,
+              ),
               hintText: 'استان خود را انتخاب کنید',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              prefixIcon: const Icon(Icons.location_city),
+              prefixIcon: Icon(Icons.location_city, color: Colors.grey[600]),
             ),
           ),
         ),
@@ -113,6 +165,7 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
 
           enabled: _selectedProvince != null,
           itemAsString: (item) => item['name']?.toString() ?? '',
+          compareFn: (a, b) => a['id'] == b['id'],
           selectedItem: _selectedCity,
           onChanged: _onCityChanged,
           popupProps: PopupProps.modalBottomSheet(
@@ -138,14 +191,39 @@ class _ProvinceCitySelectorState extends State<ProvinceCitySelector> {
           ),
           decoratorProps: DropDownDecoratorProps(
             decoration: InputDecoration(
-              labelText: 'شهر',
+              label: Text.rich(
+                TextSpan(
+                  text: 'شهر',
+                  children: [
+                    TextSpan(
+                      text: _selectedProvince != null
+                          ? '  *'
+                          : '    (ابتدا استان را انتخاب نمایید)',
+                      style: _selectedProvince != null
+                          ? TextStyle(
+                              color: Colors.red[400],
+                              fontWeight: FontWeight.bold,
+                            )
+                          : TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              labelStyle: TextStyle(
+                color: Colors.grey.shade500,
+                fontWeight: FontWeight.bold,
+              ),
               hintText: _selectedProvince != null
                   ? 'شهر خود را انتخاب کنید'
                   : 'ابتدا استان را انتخاب کنید',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              prefixIcon: const Icon(Icons.location_on),
+              prefixIcon: Icon(Icons.location_on, color: Colors.grey[600]),
             ),
           ),
         ),
