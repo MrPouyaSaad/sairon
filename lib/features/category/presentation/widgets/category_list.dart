@@ -1,4 +1,6 @@
+// lib/features/category/presentation/widgets/category_list.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sairon/core/widgets/app_list_title.dart';
 import 'package:sairon/features/category/domain/entities/category_entity.dart';
 import 'package:sairon/features/category/presentation/widgets/category_item.dart';
@@ -12,16 +14,18 @@ class CategoryList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppListTitle(title: 'دسته‌بندی'),
-        GridView.builder(
-          shrinkWrap: true,
+        AppListTitle(title: 'دسته‌بندی‌ها'),
 
+        GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+
+          shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 8.0,
-            mainAxisSpacing: 8.0,
-            childAspectRatio: 0.9,
+            crossAxisCount: 4,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 0.7,
           ),
           itemCount: categoryList.length,
           itemBuilder: (context, index) {
@@ -29,6 +33,6 @@ class CategoryList extends StatelessWidget {
           },
         ),
       ],
-    );
+    ).marginSymmetric(vertical: 8);
   }
 }
