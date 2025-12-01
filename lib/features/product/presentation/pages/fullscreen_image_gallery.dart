@@ -43,7 +43,7 @@ class _FullscreenImageGalleryState extends State<FullscreenImageGallery> {
     final images = widget.productEntity.images.urls;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: AppColors.textSecondary,
       body: Stack(
         children: [
           PhotoViewGallery.builder(

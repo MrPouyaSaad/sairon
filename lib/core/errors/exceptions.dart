@@ -19,7 +19,10 @@ class ServerException extends AppException {
       final data = response?.data;
 
       // Parse server message if available
-      final String parsedMessage = data is Map && data['message'] != null
+      final String parsedMessage =
+          data is Map &&
+              data['message'] != null &&
+              data['message'] != 'Invalid or expired token'
           ? data['message'].toString()
           : _mapStatusCodeToMessage(response?.statusCode);
 

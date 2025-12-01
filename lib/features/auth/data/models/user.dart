@@ -13,8 +13,8 @@ class UserModel extends UserEntity {
     : super(
         id: json['id'],
         phoneNumber: json['phone'],
-        firstName: json['firstName'],
-        lastName: json['lastName'],
+        firstName: json['firstName'] ?? 'بدون نام',
+        lastName: json['lastName'] ?? '',
         nationalCode: json['nationalCode'],
         email: json['email'],
       );

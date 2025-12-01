@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
+import '../../features/auth/data/repositories/auth_repo_impl.dart';
 import 'exceptions.dart';
 import 'failures.dart';
 
@@ -21,6 +24,10 @@ Exception mapDioError(DioException error) {
     final statusCode = error.response?.statusCode;
     final data = error.response?.data;
     final serverMessage = _extractServerMessage(data);
+
+    if (statusCode == 401) {
+      _handleUnauthorizedError();
+    }
 
     switch (statusCode) {
       case 400:
@@ -57,6 +64,14 @@ Exception mapDioError(DioException error) {
   }
 
   return UnknownException('خطای ناشناخته در ارتباط با سرور.');
+}
+
+void _handleUnauthorizedError() {
+  try {
+    authRepository.logOut();
+  } catch (e) {
+    log('خطا در لاگ اوت خودکار: $e');
+  }
 }
 
 /// Extract message from server response

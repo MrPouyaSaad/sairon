@@ -1,49 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:sairon/core/widgets/error_widget.dart';
+import 'package:sairon/core/widgets/loading_indicator.dart';
+import 'package:sairon/core/widgets/login_promt_screen.dart';
 import 'package:sairon/features/address/presentation/pages/address_page.dart';
+import 'package:sairon/features/auth/data/repositories/token_repo.dart';
+import 'package:sairon/features/auth/domain/entities/user.dart';
+import 'package:sairon/features/order/presentation/pages/orders_page.dart';
+import 'package:sairon/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:sairon/features/profile/domain/usecases/profile_usecases.dart';
+import 'package:sairon/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:sairon/features/profile/presentation/pages/user_info_page.dart';
 import 'package:sairon/features/profile/presentation/widgets/profile_header.dart';
 import 'package:sairon/features/profile/presentation/widgets/profile_menu_item.dart';
-
-import '../../../auth/data/models/user.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = UserModel(
-      id: 1,
-      phoneNumber: '09123456789',
-      nationalCode: '1234567890',
-      email: 'user@example.com',
-      firstName: 'علی',
-      lastName: 'محمدی',
-    );
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ProfileHeader(user: currentUser, onEditProfile: _editProfile),
+    return ValueListenableBuilder(
+      valueListenable: TokenRepository.tokenNotifier,
+      builder: (context, value, child) {
+        if (value == null) {
+          return LoginPromtScreen(
+            description: 'برای مشاهده حساب کاربری ابتدا وارد شوید.',
+          );
+        }
+        return BlocProvider(
+          create: (context) =>
+              ProfileBloc(ProfileUsecases(repository: profileRepository))
+                ..add(ProfileStarted()),
+          child: Scaffold(
+            backgroundColor: Colors.grey[50],
+            body: BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is ProfileLoading) {
+                  return Center(child: ScreenLoadingIndicator());
+                } else if (state is ProfileError) {
+                  return AppErrorWidget(
+                    message: state.message,
+                    onRetry: () {
+                      context.read<ProfileBloc>().add(ProfileStarted());
+                    },
+                  );
+                } else if (state is ProfileLoaded) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        ProfileHeader(
+                          user: state.user!,
+                          onEditProfile: () {
+                            Get.to(UserInfoPage(user: state.user!));
+                          },
+                        ),
 
-            const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-            _buildUserInfoSection(),
-            _buildOrdersSection(),
+                        _buildUserInfoSection(state.user!),
+                        _buildOrdersSection(),
 
-            _buildSupportSection(),
+                        _buildSupportSection(),
 
-            _buildLogoutSection(),
+                        _buildLogoutSection(),
 
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  );
+                } else {
+                  throw 'مشکلی در بارگیری حساب کاربری پیش آمد!';
+                }
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildUserInfoSection() {
+  Widget _buildUserInfoSection(UserEntity user) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -62,7 +99,9 @@ class ProfilePage extends StatelessWidget {
           icon: Icons.person_outline_rounded,
           title: 'ویرایش اطلاعات',
           subtitle: 'تغییر نام، ایمیل و اطلاعات شخصی',
-          onTap: _editProfile,
+          onTap: () {
+            Get.to(UserInfoPage(user: user));
+          },
           iconColor: Colors.blue,
         ),
         ProfileMenuItem(
@@ -120,14 +159,14 @@ class ProfilePage extends StatelessWidget {
         ProfileMenuItem(
           icon: Icons.support_agent_outlined,
           title: 'پشتیبانی',
-          subtitle: 'ارتباط با پشتیبانی سیرون',
+          subtitle: 'ارتباط با پشتیبانی سایرون',
           onTap: _contactSupport,
           iconColor: Colors.purple,
         ),
         ProfileMenuItem(
           icon: Icons.info_outline_rounded,
           title: 'درباره ما',
-          subtitle: 'اطلاعات درباره اپلیکیشن سیرون',
+          subtitle: 'اطلاعات درباره اپلیکیشن سایرون',
           onTap: _aboutUs,
           iconColor: Colors.teal,
         ),
@@ -186,28 +225,12 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  void _editProfile() {
-    Get.to(
-      UserInfoPage(
-        user: UserModel(
-          id: 1,
-          phoneNumber: '09123456789',
-          nationalCode: '1234567890',
-          email: 'user@example.com',
-          firstName: 'علی',
-          lastName: 'محمدی',
-        ),
-      ),
-    );
-  }
-
   void _navigateToAddresses() {
     Get.to(AddressPage());
   }
 
   void _navigateToOrders() {
-    // TODO: Navigate to orders page
-    print('صفحه سفارش‌ها');
+    Get.to(OrdersPage());
   }
 
   void _contactSupport() {

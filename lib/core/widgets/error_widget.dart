@@ -9,9 +9,16 @@ class AppErrorWidget extends StatelessWidget {
     super.key,
     required this.message,
     required this.onRetry,
+    this.buttonStyle,
+    this.textColor = AppColors.textSecondary,
+    this.buttonTextColor,
   });
   final String message;
   final Function() onRetry;
+  final Color textColor;
+  final ButtonStyle? buttonStyle;
+
+  final Color? buttonTextColor;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -20,15 +27,20 @@ class AppErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error, size: 64, color: AppColors.textSecondary),
+            Icon(Icons.error, size: 64, color: textColor),
             Gap(24),
             Text(
               message,
-              style: AppTextStyles.errorText,
+              style: AppTextStyles.errorText.copyWith(color: textColor),
               textAlign: TextAlign.center,
             ),
             Gap(24),
-            CustomButton(title: 'تلاش مجدد', onPressed: onRetry),
+            CustomButton(
+              title: 'تلاش مجدد',
+              onPressed: onRetry,
+              buttonStyle: buttonStyle,
+              textColor: buttonTextColor,
+            ),
           ],
         ),
       ),

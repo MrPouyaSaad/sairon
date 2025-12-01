@@ -1,22 +1,24 @@
 // add_address_page.dart (اصلاح شده)
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:sairon/core/widgets/app_textfield.dart';
 import 'package:sairon/core/widgets/gradient.dart';
 import 'package:sairon/features/address/domain/entities/address.dart';
+import 'package:sairon/features/address/presentation/bloc/address_bloc.dart';
 import 'package:sairon/features/address/presentation/widgets/province_city_selector.dart';
 
 import '../../../../core/widgets/gradient_appbar.dart';
 
-class AddAddress extends StatefulWidget {
-  const AddAddress({super.key, this.addressEntity});
+class AddAddressPage extends StatefulWidget {
+  const AddAddressPage({super.key, this.addressEntity});
   final AddressEntity? addressEntity;
 
   @override
-  State<AddAddress> createState() => _AddAddressState();
+  State<AddAddressPage> createState() => _AddAddressPageState();
 }
 
-class _AddAddressState extends State<AddAddress> {
+class _AddAddressPageState extends State<AddAddressPage> {
   final TextEditingController _receiverController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
@@ -47,13 +49,25 @@ class _AddAddressState extends State<AddAddress> {
     _isDefault = address.isDefault;
   }
 
+  void _onProvinceChanged(String province) {
+    setState(() {
+      _selectedProvince = province;
+    });
+  }
+
+  void _onCityChanged(String city) {
+    setState(() {
+      _selectedCity = city;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colors.surfaceVariant.withOpacity(0.3),
+      backgroundColor: colors.surfaceVariant.withOpacity(0.95),
       body: Column(
         children: [
           GradientAppBar(
@@ -132,17 +146,8 @@ class _AddAddressState extends State<AddAddress> {
                           const SizedBox(height: 20),
 
                           ProvinceCitySelector(
-                            onProvinceChanged: (province) {
-                              setState(() {
-                                _selectedProvince = province;
-                                _selectedCity = null;
-                              });
-                            },
-                            onCityChanged: (city) {
-                              setState(() {
-                                _selectedCity = city;
-                              });
-                            },
+                            onProvinceChanged: _onProvinceChanged,
+                            onCityChanged: _onCityChanged,
                             selectedProvince: _selectedProvince,
                             selectedCity: _selectedCity,
                           ),
@@ -159,7 +164,33 @@ class _AddAddressState extends State<AddAddress> {
 
                   const SizedBox(height: 30),
 
-                  GradientButton(onPressed: _saveAddress, text: 'ذخیره آدرس'),
+                  BlocBuilder<AddressBloc, AddressState>(
+                    builder: (context, state) {
+                      return GradientButton(
+                        onPressed: () {
+                          if (widget.addressEntity != null) {
+                            BlocProvider.of<AddressBloc>(context).add(
+                              EditAddress(
+                                addressEntity: AddressEntity(
+                                  id: widget.addressEntity!.id,
+
+                                  title: _titleController.text,
+                                  receiver: _receiverController.text,
+                                  province: _selectedProvince!,
+                                  city: _selectedCity!,
+                                  postalCode: _postalCodeController.text,
+                                  phoneNumber: _phoneController.text,
+                                  address: _addressController.text,
+                                  isDefault: _isDefault,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        text: 'ذخیره آدرس',
+                      );
+                    },
+                  ),
                 ],
               ).marginSymmetric(horizontal: 16, vertical: 24),
             ),
@@ -172,12 +203,12 @@ class _AddAddressState extends State<AddAddress> {
   Widget _buildDeleteButton(ColorScheme colors) {
     return Container(
       decoration: BoxDecoration(
-        color: colors.error.withOpacity(0.2),
+        color: colors.surface.withOpacity(0.2),
         shape: BoxShape.circle,
       ),
       child: IconButton(
         icon: Icon(Icons.delete_outline, color: colors.error),
-        onPressed: _deleteAddress,
+        onPressed: () {},
       ),
     );
   }
@@ -284,13 +315,5 @@ class _AddAddressState extends State<AddAddress> {
         ],
       ),
     );
-  }
-
-  void _saveAddress() {
-    Navigator.pop(context);
-  }
-
-  void _deleteAddress() {
-    // TODO: Implement delete address logic
   }
 }

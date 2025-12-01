@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:sairon/core/constants/api/api_constants.dart';
 import 'package:sairon/core/errors/exception_mapper.dart';
 import 'package:sairon/core/errors/failures.dart';
@@ -11,6 +12,7 @@ final cartRepository = CartRepositoryImpl(dataSource: _dataSource);
 
 class CartRepositoryImpl implements CartRepository {
   final CartDataSource dataSource;
+  final ValueNotifier<CartEntity?> itemCountNotifier = ValueNotifier(null);
 
   CartRepositoryImpl({required this.dataSource});
 

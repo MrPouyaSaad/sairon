@@ -11,6 +11,17 @@ class ProductVariantModel extends ProductVariantEntity {
         attributes: _parseAttributes(json['attributes']),
       );
 
+  ProductVariantEntity toEntity() {
+    return ProductVariantEntity(
+      id: id,
+      sku: sku,
+      price: price,
+      stock: stock,
+      attributes: attributes,
+      isAvailable: isAvailable,
+    );
+  }
+
   static Map<String, String> _parseAttributes(dynamic data) {
     if (data == null) return {};
 

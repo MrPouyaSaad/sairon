@@ -1,9 +1,15 @@
-// lib/features/address/presentation/pages/address_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:sairon/core/widgets/app_textfield.dart';
+import 'package:sairon/core/widgets/error_widget.dart';
 import 'package:sairon/core/widgets/gradient_appbar.dart';
+import 'package:sairon/core/widgets/loading_indicator.dart';
+import 'package:sairon/features/address/data/repositories/address_repo_impl.dart';
 import 'package:sairon/features/address/domain/entities/address.dart';
+import 'package:sairon/features/address/domain/usecases/address_usecase.dart';
+import 'package:sairon/features/address/presentation/bloc/address_bloc.dart';
+import 'package:sairon/features/address/presentation/pages/add_address.dart';
 import 'package:sairon/features/address/presentation/widgets/address_card.dart';
 
 import '../../../../core/widgets/gradient.dart';
@@ -18,53 +24,89 @@ class AddressPage extends StatefulWidget {
 
 class _AddressPageState extends State<AddressPage> {
   final TextEditingController controller = TextEditingController();
-  final List<AddressEntity> _sampleAddresses = [
-    AddressEntity(
-      id: 1,
-      title: 'منزل',
-      receiver: 'علی محمدی',
-      province: 'تهران',
-      city: 'تهران',
-      postalCode: '1234567890',
-      phoneNumber: '09123456789',
-      address: 'خیابان ولیعصر، کوچه فلان، پلاک ۱۲۳، طبقه ۲',
-      isDefault: true,
-    ),
-    AddressEntity(
-      id: 2,
-      title: 'دفتر کار',
-      receiver: 'علی محمدی',
-      province: 'تهران',
-      city: 'شهرک غرب',
-      postalCode: '0987654321',
-      phoneNumber: '02188776655',
-      address: 'بلوار فرحزادی، خیابان ایران زمین، برج سامان، واحد ۵',
-      isDefault: false,
-    ),
-  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Column(
-        children: [
-          GradientAppBar(
-            title: 'آدرس‌های من',
-            gradient: GradientTheme.primaryGradient,
-          ),
+    return BlocProvider(
+      create: (context) =>
+          AddressBloc(AddressUsecase(repository: addressRepository))
+            ..add(LoadAddressList()),
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        body: Column(
+          children: [
+            GradientAppBar(
+              title: 'آدرس‌های من',
+              gradient: GradientTheme.primaryGradient,
+            ),
+            Expanded(
+              child: BlocConsumer<AddressBloc, AddressState>(
+                listener: (context, state) {
+                  // مدیریت پیام‌های موفقیت‌آمیز
+                  if (state.operationStatus == AddressOperationStatus.success) {
+                    if (state.operationMessage?.isNotEmpty == true) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.operationMessage!),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  }
 
-          Expanded(child: _buildContent()),
-        ],
+                  // مدیریت خطاها
+                  if (state.operationStatus == AddressOperationStatus.error) {
+                    if (state.operationMessage?.isNotEmpty == true) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.operationMessage!),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return ScreenLoadingIndicator();
+                  } else if (state.operationStatus ==
+                      AddressOperationStatus.error) {
+                    return AppErrorWidget(
+                      message: state.operationMessage!,
+                      onRetry: () {
+                        BlocProvider.of<AddressBloc>(
+                          context,
+                        ).add(LoadAddressList());
+                      },
+                    );
+                  } else {
+                    if (state.addresses.isEmpty) {
+                      return EmptyAddresses(
+                        onAddAddress: () => _navigateToAddAddress(context),
+                      );
+                    } else {
+                      return _buildList(state.addresses, state, context);
+                    }
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildContent() {
-    if (_sampleAddresses.isEmpty) {
-      return EmptyAddresses(onAddAddress: _addNewAddress);
-    }
-
+  Widget _buildList(
+    List<AddressEntity> addresses,
+    AddressState state,
+    BuildContext context,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -80,28 +122,45 @@ class _AddressPageState extends State<AddressPage> {
                   isRequired: false,
                 ),
               ),
-              Gap(12),
+              const Gap(12),
               GradientButton(
-                onPressed: _addNewAddress,
+                onPressed: () => _navigateToAddAddress(context),
                 text: 'افزودن آدرس',
                 shadow: false,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Icon(Icons.add_rounded, size: 28, color: Colors.white),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: const Icon(
+                  Icons.add_rounded,
+                  size: 28,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-
           Expanded(
             child: ListView.builder(
-              itemCount: _sampleAddresses.length,
+              itemCount: addresses.length,
               itemBuilder: (context, index) {
-                final address = _sampleAddresses[index];
+                final address = addresses[index];
+                final isWorking = state.workingAddressId != null
+                    ? int.parse(state.workingAddressId!) == address.id &&
+                          state.operationStatus ==
+                              AddressOperationStatus.loading
+                    : false;
+
                 return AddressCard(
                   address: address,
-                  onEdit: () => _editAddress(address),
-                  onDelete: () => _deleteAddress(address),
-                  onSetDefault: () => _setDefaultAddress(address),
+                  isLoading: isWorking,
+                  onEdit: () => _editAddress(address, context),
+                  onDelete: () => BlocProvider.of<AddressBloc>(
+                    context,
+                  ).add(RemoveAddress(addressId: address.id.toString())),
+                  onSetDefault: () => BlocProvider.of<AddressBloc>(
+                    context,
+                  ).add(SetAsDefault(addressId: address.id.toString())),
                 );
               },
             ),
@@ -111,28 +170,27 @@ class _AddressPageState extends State<AddressPage> {
     );
   }
 
-  void _addNewAddress() {
-    // TODO: Navigate to add address page
-    print('افزودن آدرس جدید');
+  void _navigateToAddAddress(BuildContext context) {
+    final addressBloc = BlocProvider.of<AddressBloc>(context);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: addressBloc,
+          child: const AddAddressPage(),
+        ),
+      ),
+    );
   }
 
-  void _editAddress(AddressEntity address) {
-    // TODO: Navigate to edit address page
-    print('ویرایش آدرس: ${address.title}');
-  }
-
-  void _deleteAddress(AddressEntity address) {
-    // TODO: Show confirmation dialog and delete address
-    print('حذف آدرس: ${address.title}');
-  }
-
-  void _setDefaultAddress(AddressEntity address) {
-    // TODO: Set address as default
-    print('تنظیم آدرس پیش‌فرض: ${address.title}');
-  }
-
-  void _showFilterOptions() {
-    // TODO: Show filter bottom sheet
-    print('نمایش فیلترها');
+  void _editAddress(AddressEntity address, BuildContext context) {
+    final addressBloc = BlocProvider.of<AddressBloc>(context);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: addressBloc,
+          child: AddAddressPage(addressEntity: address),
+        ),
+      ),
+    );
   }
 }

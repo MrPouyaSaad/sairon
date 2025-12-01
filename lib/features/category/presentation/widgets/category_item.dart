@@ -1,4 +1,3 @@
-// lib/features/category/presentation/widgets/modern_category_item.dart
 import 'package:flutter/material.dart';
 import 'package:sairon/core/themes/text_styles.dart';
 import 'package:sairon/core/widgets/gradient.dart';
@@ -17,72 +16,79 @@ class CategoryItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.all(4),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 120),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 75,
-                height: 75,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Image Container
+            Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                 ),
-                child: Container(
-                  margin: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: categoryEntity.imageUrl.isEmpty
-                        ? null
-                        : Colors.white,
-                    gradient: categoryEntity.imageUrl.isEmpty
-                        ? GradientTheme.cardGradient
-                        : null,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: categoryEntity.imageUrl.isEmpty
-                      ? Center(
-                          child: Text(
-                            categoryEntity.name[0],
-                            style: TextStyle(fontSize: 32, color: Colors.white),
-                          ),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: ImageLoadingService(
-                            imageUrl: categoryEntity.imageUrl,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: categoryEntity.imageUrl.isEmpty ? null : Colors.white,
+                  gradient: categoryEntity.imageUrl.isEmpty
+                      ? GradientTheme.cardGradient
+                      : null,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: categoryEntity.imageUrl.isEmpty
+                    ? Center(
+                        child: Text(
+                          categoryEntity.name[0],
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: ImageLoadingService(
+                          imageUrl: categoryEntity.imageUrl,
+                        ),
+                      ),
               ),
-              const SizedBox(height: 8),
+            ),
+            const SizedBox(height: 6),
 
-              SizedBox(
-                height: 32,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Text(
-                    categoryEntity.name,
-                    style: AppTextStyles.caption.copyWith(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800],
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            Container(
+              width: 70,
+              height: 32, //
+              alignment: Alignment.center,
+              child: Text(
+                categoryEntity.name,
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: _calculateFontSize(categoryEntity.name),
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[800],
+                  height: 1.5,
                 ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  double _calculateFontSize(String text) {
+    if (text.length <= 8) return 12;
+    if (text.length <= 12) return 11;
+    if (text.length <= 16) return 10;
+    return 9;
   }
 }

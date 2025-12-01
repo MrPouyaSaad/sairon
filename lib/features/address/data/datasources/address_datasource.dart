@@ -6,8 +6,8 @@ abstract class AddressDataSource {
   Future<List<AddressEntity>> getAddresses();
   Future<void> editAddress(AddressEntity address);
   Future<void> addAddress(AddressEntity address);
-  Future<void> removeAddress(AddressEntity address);
-  Future<void> setDefaultAddress(int addressId);
+  Future<void> removeAddress(String id);
+  Future<void> setDefaultAddress(String id);
 }
 
 class AddressDataSourceImpl implements AddressDataSource {
@@ -72,14 +72,12 @@ class AddressDataSourceImpl implements AddressDataSource {
   }
 
   @override
-  Future<void> removeAddress(AddressEntity address) async {
-    await httpClient.delete('${AppRoutes.profile.addresses}/${address.id}');
+  Future<void> removeAddress(String id) async {
+    await httpClient.delete('${AppRoutes.profile.addresses}/$id');
   }
 
   @override
-  Future<void> setDefaultAddress(int addressId) async {
-    await httpClient.patch(
-      AppRoutes.profile.setDefaultAddress(addressId.toString()),
-    );
+  Future<void> setDefaultAddress(String id) async {
+    await httpClient.patch(AppRoutes.profile.setDefaultAddress(id));
   }
 }

@@ -12,6 +12,8 @@ class ModernTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.title,
     this.enabled = true,
+    this.validator,
+    this.onChanged,
   });
 
   final TextEditingController controller;
@@ -21,6 +23,8 @@ class ModernTextField extends StatelessWidget {
   final bool isRequired;
   final TextInputType keyboardType;
   final bool enabled;
+  final String? Function(String?)? validator;
+  final Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,7 @@ class ModernTextField extends StatelessWidget {
         ],
         Container(
           height: Constants.primaryButtonHeight,
-          padding: EdgeInsets.only(left: 3),
+          padding: const EdgeInsets.only(left: 3),
           decoration: BoxDecoration(
             color: enabled ? Colors.grey[50] : Colors.grey[200],
             borderRadius: BorderRadius.circular(16),
@@ -69,22 +73,48 @@ class ModernTextField extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: TextField(
+                child: TextFormField(
                   controller: controller,
                   keyboardType: keyboardType,
                   textAlign: TextAlign.center,
                   enabled: enabled,
+                  validator: validator,
+                  onChanged: onChanged,
+
                   decoration: InputDecoration(
                     hintText: hintText,
                     hintStyle: TextStyle(color: Colors.grey[500]),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
+                    errorStyle: const TextStyle(height: 0.5, fontSize: 11),
                   ),
                 ),
               ),
             ],
           ),
         ),
+        if (validator != null)
+          Container(
+            height: 36,
+            padding: const EdgeInsets.only(top: 4, right: 8),
+            child: Builder(
+              builder: (context) {
+                final errorText = validator!(controller.text);
+                if (errorText != null && errorText.isNotEmpty) {
+                  return Text(
+                    errorText,
+                    style: TextStyle(
+                      wordSpacing: -1,
+                      color: Colors.red[600],
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
       ],
     );
   }

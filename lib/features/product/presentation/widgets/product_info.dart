@@ -9,9 +9,14 @@ import '../../domain/entities/product_entity.dart';
 import '../../domain/entities/variants.dart';
 
 class ProductInfo extends StatefulWidget {
-  const ProductInfo({super.key, required this.productEntity});
+  const ProductInfo({
+    super.key,
+    required this.productEntity,
+    required this.onVariantSelected,
+  });
 
   final ProductEntity productEntity;
+  final Function(String?) onVariantSelected;
 
   @override
   State<ProductInfo> createState() => _ProductInfoState();
@@ -35,14 +40,17 @@ class _ProductInfoState extends State<ProductInfo> {
       return;
     }
 
-    final cheapestVariant = variants.reduce((a, b) {
-      final pa = double.tryParse(a.price) ?? 0;
-      final pb = double.tryParse(b.price) ?? 0;
-      return pa < pb ? a : b;
-    });
+    final sortedVariants = List<ProductVariantEntity>.from(variants)
+      ..sort((a, b) {
+        final priceA = double.tryParse(a.price) ?? 0;
+        final priceB = double.tryParse(b.price) ?? 0;
+        return priceA.compareTo(priceB);
+      });
 
+    final cheapestVariant = sortedVariants.first;
     _selectedAttributes = Map<String, String>.from(cheapestVariant.attributes);
     _selectedVariant = cheapestVariant;
+    widget.onVariantSelected(_selectedVariant?.id);
   }
 
   void _selectBestVariant() {
@@ -50,22 +58,37 @@ class _ProductInfoState extends State<ProductInfo> {
 
     if (variants.isEmpty) {
       _selectedVariant = null;
+      widget.onVariantSelected(null);
       return;
     }
 
-    final matched = variants.firstWhereOrNull(
-      (v) => _selectedAttributes.entries.every(
-        (e) => v.attributes[e.key] == e.value,
-      ),
-    );
+    ProductVariantEntity? matchedVariant;
+    for (final variant in variants) {
+      final isMatch = _selectedAttributes.entries.every(
+        (entry) => variant.attributes[entry.key] == entry.value,
+      );
+      if (isMatch) {
+        matchedVariant = variant;
+        break;
+      }
+    }
 
-    _selectedVariant =
-        matched ??
-        variants.reduce((a, b) {
-          final pa = double.tryParse(a.price) ?? 0;
-          final pb = double.tryParse(b.price) ?? 0;
-          return pa < pb ? a : b;
+    if (matchedVariant != null) {
+      _selectedVariant = matchedVariant;
+      widget.onVariantSelected(_selectedVariant?.id);
+      return;
+    }
+
+    if (variants.isNotEmpty) {
+      final sortedVariants = List<ProductVariantEntity>.from(variants)
+        ..sort((a, b) {
+          final priceA = double.tryParse(a.price) ?? 0;
+          final priceB = double.tryParse(b.price) ?? 0;
+          return priceA.compareTo(priceB);
         });
+      _selectedVariant = sortedVariants.first;
+      widget.onVariantSelected(_selectedVariant?.id);
+    }
   }
 
   void _onAttributeSelected(String key, String value) {
@@ -77,10 +100,8 @@ class _ProductInfoState extends State<ProductInfo> {
 
   String _getCurrentPrice() {
     final discountValue = double.tryParse(widget.productEntity.discount) ?? 0;
-    final discountType =
-        widget.productEntity.discountType; // "percent" or "amount"
+    final discountType = widget.productEntity.discountType;
 
-    // پایه قیمت: اگر ورینت انتخاب شده از اون بگیر، وگرنه از خود محصول
     final basePrice =
         double.tryParse(
           _selectedVariant?.price ?? widget.productEntity.orginalPrice,
@@ -93,24 +114,28 @@ class _ProductInfoState extends State<ProductInfo> {
 
     if (discountType == 'percent') {
       finalPrice = basePrice * (1 - discountValue / 100);
-    } else if (discountType == 'amount') {
+    } else if (discountType == 'fixed') {
       finalPrice = basePrice - discountValue;
     } else {
       finalPrice = basePrice;
     }
 
-    // اطمینان از اینکه قیمت منفی نشه
     if (finalPrice < 0) finalPrice = 0;
 
     return finalPrice.toStringAsFixed(0);
   }
 
   bool get _hasDiscount =>
-      (int.tryParse(widget.productEntity.discount) ?? 0) > 0;
+      (double.tryParse(widget.productEntity.discount) ?? 0) > 0;
 
-  bool get _isInStock =>
-      int.tryParse(_selectedVariant?.stock ?? '0') != null &&
-      int.parse(_selectedVariant?.stock ?? '0') > 0;
+  bool get _isInStock {
+    if (_selectedVariant != null) {
+      return int.tryParse(_selectedVariant!.stock) != null &&
+          int.parse(_selectedVariant!.stock) > 0;
+    }
+    return int.tryParse(widget.productEntity.stock) != null &&
+        int.parse(widget.productEntity.stock) > 0;
+  }
 
   Map<String, Set<String>> get _attributesMap {
     final map = <String, Set<String>>{};
@@ -132,11 +157,11 @@ class _ProductInfoState extends State<ProductInfo> {
         _titleSection(),
         const Gap(12),
         _stockSection(),
-        Divider().marginSymmetric(vertical: 12),
+        const Divider().marginSymmetric(vertical: 12),
         _variantSelector(),
-        Divider().marginSymmetric(vertical: 12),
+        const Divider().marginSymmetric(vertical: 12),
         _technicalSpecs(),
-        Divider().marginSymmetric(vertical: 12),
+        const Divider().marginSymmetric(vertical: 12),
         _description(),
       ],
     ).marginSymmetric(horizontal: 24);
@@ -147,7 +172,7 @@ class _ProductInfoState extends State<ProductInfo> {
         _selectedVariant?.price ?? widget.productEntity.orginalPrice;
     final discountedPrice = _getCurrentPrice();
 
-    final hasDiscount = (int.tryParse(widget.productEntity.discount) ?? 0) > 0;
+    final hasDiscount = _hasDiscount;
 
     return Row(
       children: [
@@ -223,6 +248,13 @@ class _ProductInfoState extends State<ProductInfo> {
             color: _isInStock ? Colors.green : Colors.redAccent,
           ),
         ),
+        if (_selectedVariant != null && _isInStock) ...[
+          const Gap(8),
+          Text(
+            '(${_selectedVariant!.stock} عدد)',
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
       ],
     );
   }
@@ -250,8 +282,12 @@ class _ProductInfoState extends State<ProductInfo> {
               runSpacing: 8,
               children: entry.value.map((val) {
                 final selected = _selectedAttributes[entry.key] == val;
+                final isAvailable = _isVariantAvailable(entry.key, val);
+
                 return GestureDetector(
-                  onTap: () => _onAttributeSelected(entry.key, val),
+                  onTap: isAvailable
+                      ? () => _onAttributeSelected(entry.key, val)
+                      : null,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
@@ -263,11 +299,15 @@ class _ProductInfoState extends State<ProductInfo> {
                       borderRadius: BorderRadius.circular(12),
                       color: selected
                           ? AppColors.primaryColor.withOpacity(0.1)
-                          : AppColors.backgroundColor,
+                          : (isAvailable
+                                ? AppColors.backgroundColor
+                                : Colors.grey.withOpacity(0.1)),
                       border: Border.all(
                         color: selected
                             ? AppColors.primaryColor
-                            : Colors.grey.shade300,
+                            : (isAvailable
+                                  ? Colors.grey.shade300
+                                  : Colors.grey.shade200),
                         width: selected ? 2 : 1.5,
                       ),
                     ),
@@ -289,7 +329,9 @@ class _ProductInfoState extends State<ProductInfo> {
                                 : FontWeight.w500,
                             color: selected
                                 ? AppColors.primaryColor
-                                : AppColors.textPrimary,
+                                : (isAvailable
+                                      ? AppColors.textPrimary
+                                      : Colors.grey),
                             fontSize: 14,
                           ),
                         ),
@@ -306,6 +348,21 @@ class _ProductInfoState extends State<ProductInfo> {
     );
   }
 
+  bool _isVariantAvailable(String attributeKey, String attributeValue) {
+    final tempAttributes = Map<String, String>.from(_selectedAttributes);
+    tempAttributes[attributeKey] = attributeValue;
+
+    for (final variant in widget.productEntity.variants) {
+      final isMatch = tempAttributes.entries.every(
+        (entry) => variant.attributes[entry.key] == entry.value,
+      );
+      if (isMatch && (int.tryParse(variant.stock) ?? 0) > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Widget _technicalSpecs() {
     final attributes = widget.productEntity.attributes;
     if (attributes.isEmpty) return const SizedBox();
@@ -313,7 +370,7 @@ class _ProductInfoState extends State<ProductInfo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'مشخصات فنی',
           style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -321,22 +378,37 @@ class _ProductInfoState extends State<ProductInfo> {
             color: AppColors.textPrimary,
           ),
         ),
-        const Gap(8),
+        const SizedBox(height: 8),
         ...attributes.map(
           (a) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(a.name, style: const TextStyle(fontSize: 14)),
-                Text(
-                  a.value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey[300]!, width: 0.5),
                 ),
-              ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    a.name,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  Text(
+                    a.value,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

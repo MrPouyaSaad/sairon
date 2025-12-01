@@ -21,7 +21,9 @@ class ProductModel extends ProductEntity {
         ),
         images: ProductImages.fromJson(json['images']),
         image: json['image'] ?? '',
-        category: CategoryModel.fromJson(json['category']),
+        category: json['category'] == null
+            ? null
+            : CategoryModel.fromJson(json['category']),
         attributes:
             (json['attributes'] as List<dynamic>?)
                 ?.map(

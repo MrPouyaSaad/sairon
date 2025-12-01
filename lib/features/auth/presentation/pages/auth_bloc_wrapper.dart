@@ -5,6 +5,7 @@ import 'package:sairon/features/auth/data/repositories/auth_repo_impl.dart';
 import 'package:sairon/features/auth/domain/usecases/usecases.dart';
 import 'package:sairon/features/auth/presentation/bloc/auth_bloc.dart';
 
+import '../../../root/presentation/pages/root.dart';
 import 'send_code.dart';
 import 'verify_code.dart';
 
@@ -29,9 +30,9 @@ class AuthWrapper extends StatelessWidget {
             final returnTo = args?['returnTo'];
 
             if (returnTo != null && returnTo is String && returnTo.isNotEmpty) {
-              Get.offAllNamed(returnTo);
+              Get.offNamed(returnTo);
             } else {
-              Get.offAllNamed('/');
+              Get.off(() => RootScreen());
             }
           } else if (state is AuthSendCodeError || state is AuthVerifyError) {
             final msg = (state is AuthSendCodeError)

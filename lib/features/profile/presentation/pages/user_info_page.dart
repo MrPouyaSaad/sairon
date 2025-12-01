@@ -24,6 +24,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
   late TextEditingController _emailController;
   late TextEditingController _nationalCodeController;
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +52,70 @@ class _UserInfoPageState extends State<UserInfoPage> {
     super.dispose();
   }
 
+  String? _validatePersianName(String? value, String fieldName) {
+    if (value == null || value.isEmpty) {
+      return 'لطفا $fieldName خود را وارد کنید';
+    }
+
+    final persianRegex = RegExp(r'^[\u0600-\u06FF\s]+$');
+    if (!persianRegex.hasMatch(value)) {
+      return '$fieldName باید فقط شامل حروف فارسی باشد';
+    }
+
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    if (!emailRegex.hasMatch(value)) {
+      return 'فرمت ایمیل نامعتبر است';
+    }
+
+    return null;
+  }
+
+  String? _validateNationalCode(String? value) {
+    if (value == null || value.isEmpty) {
+      return null; // کد ملی اختیاری است
+    }
+
+    if (value.length != 10) {
+      return 'کد ملی باید ۱۰ رقمی باشد';
+    }
+
+    final digitRegex = RegExp(r'^\d+$');
+    if (!digitRegex.hasMatch(value)) {
+      return 'کد ملی باید فقط شامل اعداد باشد';
+    }
+
+    try {
+      final code = value.split('').map(int.parse).toList();
+      int sum = 0;
+
+      for (int i = 0; i < 9; i++) {
+        sum += code[i] * (10 - i);
+      }
+
+      int remainder = sum % 11;
+      int controlDigit = code[9];
+
+      if ((remainder < 2 && controlDigit == remainder) ||
+          (remainder >= 2 && controlDigit == (11 - remainder))) {
+        return null;
+      } else {
+        return 'کد ملی معتبر نیست';
+      }
+    } catch (e) {
+      return 'کد ملی نامعتبر است';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,98 +128,114 @@ class _UserInfoPageState extends State<UserInfoPage> {
             onBackPressed: () => Navigator.of(context).pop(),
           ),
 
-          // محتوای فرم
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  // کارت فرم
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ModernTextField(
-                                  controller: _firstNameController,
-                                  hintText: 'نام',
-                                  icon: Icons.person_outline,
-                                  isRequired: true,
-                                  title: 'نام',
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ModernTextField(
-                                  controller: _lastNameController,
-                                  hintText: 'نام خانوادگی',
-                                  icon: Icons.person_outlined,
-                                  isRequired: true,
-                                  title: 'نام خانوادگی',
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          ModernTextField(
-                            controller: _phoneController,
-                            hintText: 'شماره موبایل',
-                            icon: Icons.phone_iphone_outlined,
-                            isRequired: true,
-                            keyboardType: TextInputType.phone,
-                            title: 'شماره موبایل',
-                          ),
-                          const SizedBox(height: 20),
-
-                          ModernTextField(
-                            controller: _nationalCodeController,
-                            hintText: 'کد ملی',
-                            icon: Icons.badge_outlined,
-                            isRequired: true,
-                            keyboardType: TextInputType.number,
-                            title: 'کد ملی',
-                          ),
-                          const SizedBox(height: 20),
-
-                          ModernTextField(
-                            controller: _emailController,
-                            hintText: 'ایمیل (اختیاری)',
-                            icon: Icons.email_outlined,
-                            isRequired: false,
-                            keyboardType: TextInputType.emailAddress,
-                            title: 'ایمیل',
-                          ),
-                          const SizedBox(height: 30),
-
-                          GradientButton(
-                            text: 'ذخیره اطلاعات',
-                            onPressed: () {},
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // کارت فرم
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
                         ],
                       ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ModernTextField(
+                                    controller: _firstNameController,
+                                    hintText: 'نام',
+                                    icon: Icons.person_outline,
+                                    isRequired: true,
+                                    title: 'نام',
+                                    validator: (value) =>
+                                        _validatePersianName(value, 'نام'),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: ModernTextField(
+                                    controller: _lastNameController,
+                                    hintText: 'نام خانوادگی',
+                                    icon: Icons.person_outlined,
+                                    isRequired: true,
+                                    title: 'نام خانوادگی',
+                                    validator: (value) => _validatePersianName(
+                                      value,
+                                      'نام خانوادگی',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+
+                            ModernTextField(
+                              controller: _phoneController,
+                              hintText: 'شماره موبایل',
+                              icon: Icons.phone_iphone_outlined,
+                              isRequired: true,
+                              keyboardType: TextInputType.phone,
+                              title: 'شماره موبایل',
+                              enabled: false,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'لطفا شماره موبایل خود را وارد کنید';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
+
+                            ModernTextField(
+                              controller: _nationalCodeController,
+                              hintText: 'کد ملی (اختیاری)',
+                              icon: Icons.badge_outlined,
+                              isRequired: false,
+                              keyboardType: TextInputType.number,
+                              title: 'کد ملی',
+                              validator: _validateNationalCode,
+                            ),
+                            const SizedBox(height: 20),
+
+                            ModernTextField(
+                              controller: _emailController,
+                              hintText: 'ایمیل (اختیاری)',
+                              icon: Icons.email_outlined,
+                              isRequired: false,
+                              keyboardType: TextInputType.emailAddress,
+                              title: 'ایمیل',
+                              validator: _validateEmail,
+                            ),
+                            const SizedBox(height: 30),
+
+                            GradientButton(
+                              text: 'ذخیره اطلاعات',
+                              onPressed: _saveUserInfo,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // اطلاعات حساب
-                  _buildAccountInfoCard(),
-                ],
+                    _buildAccountInfoCard(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -231,24 +313,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   void _saveUserInfo() {
-    // اعتبارسنجی فیلدهای اجباری
-    if (_firstNameController.text.isEmpty) {
-      _showError('لطفا نام خود را وارد کنید');
-      return;
-    }
-
-    if (_lastNameController.text.isEmpty) {
-      _showError('لطفا نام خانوادگی خود را وارد کنید');
-      return;
-    }
-
-    if (_phoneController.text.isEmpty) {
-      _showError('لطفا شماره موبایل خود را وارد کنید');
-      return;
-    }
-
-    if (_nationalCodeController.text.isEmpty) {
-      _showError('لطفا کد ملی خود را وارد کنید');
+    // اعتبارسنجی فرم
+    if (!_formKey.currentState!.validate()) {
+      _showError('لطفا خطاهای فرم را برطرف کنید');
       return;
     }
 
@@ -261,7 +328,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
       lastName: _lastNameController.text,
     );
 
-    // TODO: Save user info to backend
     _saveChanges(updatedUser);
   }
 

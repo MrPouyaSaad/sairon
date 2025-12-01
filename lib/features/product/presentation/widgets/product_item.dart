@@ -118,7 +118,7 @@ class ProductItem extends StatelessWidget {
             productEntity.name,
             style: AppTextStyles.bodyLarge.copyWith(
               fontWeight: FontWeight.w600,
-              height: 1.4,
+              fontSize: 13,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -131,36 +131,37 @@ class ProductItem extends StatelessWidget {
   }
 
   Widget _buildPriceSection(bool isDiscounted) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        if (isDiscounted)
-          Text(
-            productEntity.orginalPrice.formattedStringPrice,
-            style: AppTextStyles.caption.copyWith(
-              decoration: TextDecoration.lineThrough,
-              decorationColor: Colors.grey.shade500,
-              color: Colors.grey[500],
-              fontSize: 14,
+    return Align(
+      alignment: Alignment.bottomLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (isDiscounted)
+            Text(
+              productEntity.orginalPrice.formattedStringPrice.withPriceLable,
+              style: AppTextStyles.caption.copyWith(
+                decoration: TextDecoration.lineThrough,
+                decorationColor: Colors.grey.shade500,
+                color: Colors.grey[600],
+                fontSize: 12,
+              ),
+            ).marginOnly(right: 12, bottom: 4, left: 12),
+
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              gradient: GradientTheme.cardGradient,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(Constants.primaryRadiusValue),
+                topRight: Radius.circular(Constants.primaryRadiusValue),
+              ),
             ),
-          ).marginOnly(right: 12),
-
-        const MaxGap(50),
-
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            gradient: GradientTheme.cardGradient,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(Constants.primaryRadiusValue),
-              topRight: Radius.circular(Constants.primaryRadiusValue),
+            child: GradientText(
+              productEntity.discountedPrice.formattedStringPrice.withPriceLable,
             ),
           ),
-          child: GradientText(
-            productEntity.discountedPrice.formattedStringPrice.withPriceLable,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

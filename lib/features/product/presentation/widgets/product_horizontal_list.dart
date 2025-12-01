@@ -15,7 +15,7 @@ class ProductHorizontalList extends StatelessWidget {
       children: [
         AppListTitle(title: title),
         SizedBox(
-          height: 260,
+          height: 305,
           child: ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: Constants.primaryPadding),
             scrollDirection: Axis.horizontal,

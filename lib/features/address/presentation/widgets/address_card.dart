@@ -1,7 +1,5 @@
-// lib/features/address/presentation/widgets/address_card.dart
 import 'package:flutter/material.dart';
 import 'package:sairon/features/address/domain/entities/address.dart';
-
 import '../../../../core/widgets/gradient.dart';
 
 class AddressCard extends StatelessWidget {
@@ -10,6 +8,7 @@ class AddressCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onSetDefault;
   final bool isSelected;
+  final bool isLoading;
 
   const AddressCard({
     super.key,
@@ -18,60 +17,65 @@ class AddressCard extends StatelessWidget {
     required this.onDelete,
     required this.onSetDefault,
     this.isSelected = false,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-        border: isSelected
-            ? Border.all(color: const Color(0xFF7E22CE), width: 2)
-            : null,
-      ),
+    return IgnorePointer(
+      ignoring: isLoading, // هنگام عملیات، کارت غیر قابل کلیک
       child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCardHeader(),
-                const SizedBox(height: 12),
-
-                _buildReceiverInfo(),
-                const SizedBox(height: 8),
-
-                _buildAddressInfo(),
-                const SizedBox(height: 12),
-
-                _buildActionButtons(),
+          Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.12),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
               ],
+              border: isSelected
+                  ? Border.all(color: const Color(0xFF7E22CE), width: 2)
+                  : null,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 12),
+                  _buildReceiverInfo(),
+                  const SizedBox(height: 10),
+                  _buildAddressInfo(),
+                  const SizedBox(height: 16),
+                  _buildActions(context),
+                ],
+              ),
             ),
           ),
 
-          if (address.isDefault) _buildDefaultBadge(),
+          /// ستاره پیش‌فرض
+          if (address.isDefault) _buildDefaultIcon(),
+
+          /// لودینگ روی کارت
+          if (isLoading) _buildLoading(),
         ],
       ),
     );
   }
 
-  Widget _buildCardHeader() {
+  Widget _buildHeader() {
     return Row(
       children: [
         GradientText(
           address.title,
           gradient: GradientTheme.buttonGradient,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
         const Spacer(),
         if (address.isDefault)
@@ -82,7 +86,7 @@ class AddressCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text(
-              'پیش‌فرض',
+              "پیش‌فرض",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 12,
@@ -97,7 +101,7 @@ class AddressCard extends StatelessWidget {
   Widget _buildReceiverInfo() {
     return Row(
       children: [
-        Icon(Icons.person_outline, color: Colors.grey[600], size: 16),
+        Icon(Icons.person_outline, size: 16, color: Colors.grey[600]),
         const SizedBox(width: 6),
         Text(
           address.receiver,
@@ -108,7 +112,7 @@ class AddressCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        Icon(Icons.phone_iphone, color: Colors.grey[600], size: 16),
+        Icon(Icons.phone_iphone, size: 16, color: Colors.grey[600]),
         const SizedBox(width: 6),
         Text(
           address.phoneNumber,
@@ -124,15 +128,15 @@ class AddressCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.location_on_outlined, color: Colors.grey[600], size: 16),
+            Icon(Icons.location_on_outlined, size: 16, color: Colors.grey[600]),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
-                '${address.province}، ${address.city}',
+                "${address.province}، ${address.city}",
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
                   color: Colors.grey[800],
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -143,20 +147,20 @@ class AddressCard extends StatelessWidget {
           padding: const EdgeInsets.only(left: 22),
           child: Text(
             address.address,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[600],
-              height: 1.4,
-            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: Colors.grey[600],
+            ),
           ),
         ),
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.only(left: 22),
           child: Text(
-            'کد پستی: ${address.postalCode}',
+            "کد پستی: ${address.postalCode}",
             style: TextStyle(fontSize: 12, color: Colors.grey[500]),
           ),
         ),
@@ -164,22 +168,22 @@ class AddressCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActions(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          child: _buildActionButton(
+          child: _actionButton(
             icon: Icons.edit_outlined,
-            text: 'ویرایش',
+            text: "ویرایش",
             color: const Color(0xFF1E3A8A),
             onTap: onEdit,
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _buildActionButton(
+          child: _actionButton(
             icon: Icons.delete_outline,
-            text: 'حذف',
+            text: "حذف",
             color: Colors.red,
             onTap: onDelete,
           ),
@@ -187,10 +191,10 @@ class AddressCard extends StatelessWidget {
         const SizedBox(width: 8),
         if (!address.isDefault)
           Expanded(
-            child: _buildActionButton(
+            child: _actionButton(
               icon: Icons.star_outline,
-              text: 'پیش‌فرض',
-              color: Colors.amber,
+              text: "پیش‌فرض",
+              color: Colors.amber[800]!,
               onTap: onSetDefault,
             ),
           ),
@@ -198,45 +202,47 @@ class AddressCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton({
+  Widget _actionButton({
     required IconData icon,
     required String text,
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.3)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: color, size: 16),
-              const SizedBox(width: 4),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: color,
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 16, color: color),
+                const SizedBox(width: 4),
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDefaultBadge() {
+  Widget _buildDefaultIcon() {
     return Positioned(
       top: 12,
       left: 12,
@@ -247,6 +253,24 @@ class AddressCard extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: const Icon(Icons.star_rounded, color: Colors.white, size: 12),
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.65),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Center(
+          child: SizedBox(
+            height: 30,
+            width: 30,
+            child: CircularProgressIndicator(strokeWidth: 2.4),
+          ),
+        ),
       ),
     );
   }

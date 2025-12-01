@@ -10,7 +10,10 @@ class CartItemModel extends CartItemEntity {
         quantity: json['quantity'],
         totalPrice: json['itemTotal'] ?? 0,
         variantId: json['variantId'],
-        variant: ProductVariantModel.fromJson(json['variant']),
+        variant: json['variant'] != null
+            ? ProductVariantModel.fromJson(json['variant']).toEntity()
+            : null,
+
         lockedPrice: json['lockedPrice'] ?? 0,
         lockedDiscount: json['lockedDiscount'] ?? 0,
         currentPrice: json['currentPrice'] ?? 0,

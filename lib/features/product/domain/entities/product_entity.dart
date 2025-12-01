@@ -15,7 +15,7 @@ class ProductEntity {
   final String stock;
   final String image;
   final ProductImages images;
-  final CategoryEntity category;
+  final CategoryEntity? category;
   final List<ProductAttributeEntity> attributes;
   final List<ProductVariantEntity> variants;
 
@@ -30,7 +30,7 @@ class ProductEntity {
     required this.stock,
     required this.images,
     required this.image,
-    required this.category,
+    this.category,
     required this.attributes,
     required this.variants,
   });

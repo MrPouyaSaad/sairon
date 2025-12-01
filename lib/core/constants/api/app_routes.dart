@@ -84,7 +84,7 @@ class CartRoutes {
 class ProfileRoutes {
   const ProfileRoutes();
 
-  final String base = '/api/user/profile';
+  final String baseUrl = '/api/user/profile';
   final String addresses = '/api/user/addresses';
 
   String addressDetails(String addressId) => '/api/user/addresses/$addressId';
@@ -97,6 +97,10 @@ class OrderRoutes {
 
   final String base = '/api/orders';
   final String stats = '/api/orders/stats';
+
+  final String calculateShipping = '/api/orders/shipping/calculate';
+  final String validateCart = '/api/orders/validate-cart';
+  final String calculatePreview = '/api/orders/calculate-preview';
 
   String details(String orderId) => '/api/orders/$orderId';
   String cancel(String orderId) => '/api/orders/$orderId/cancel';

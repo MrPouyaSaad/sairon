@@ -1,49 +1,41 @@
 part of 'cart_bloc.dart';
 
-abstract class CartEvent extends Equatable {
+abstract class CartEvent {
   const CartEvent();
-
-  @override
-  List<Object> get props => [];
 }
 
 class CartStarted extends CartEvent {}
 
-class AddToCart extends CartEvent {
+class CartAdd extends CartEvent {
   final String productId;
   final int quantity;
   final String? variantId;
 
-  const AddToCart({required this.productId, this.quantity = 1, this.variantId});
-
-  @override
-  List<Object> get props => [productId, quantity];
+  const CartAdd({
+    required this.productId,
+    required this.quantity,
+    this.variantId,
+  });
 }
 
-class UpdateQuantityCart extends CartEvent {
-  final String productId;
+class CartRemove extends CartEvent {
+  final String itemId;
+
+  const CartRemove(this.itemId);
+}
+
+class CartIncrease extends CartEvent {
+  final String itemId;
   final int quantity;
 
-  const UpdateQuantityCart({required this.productId, required this.quantity});
-
-  @override
-  List<Object> get props => [productId, quantity];
+  const CartIncrease({required this.itemId, required this.quantity});
 }
 
-class DecrementCart extends CartEvent {
-  final String productId;
+class CartDecrease extends CartEvent {
+  final String itemId;
+  final int quantity;
 
-  const DecrementCart({required this.productId});
-
-  @override
-  List<Object> get props => [productId];
+  const CartDecrease({required this.itemId, required this.quantity});
 }
 
-class RemoveFromCart extends CartEvent {
-  final String productId;
-
-  const RemoveFromCart({required this.productId});
-
-  @override
-  List<Object> get props => [productId];
-}
+class CartClear extends CartEvent {}
