@@ -6,18 +6,17 @@ import 'package:iconsax/iconsax.dart';
 import 'package:sairon/core/constants/app_constants.dart';
 import 'package:sairon/core/themes/app_colors.dart';
 import 'package:sairon/core/utils/extensions.dart';
-import 'package:sairon/core/widgets/gradient.dart';
 import 'package:sairon/features/auth/data/repositories/token_repo.dart';
 import 'package:sairon/features/auth/presentation/pages/auth_bloc_wrapper.dart';
-import 'package:sairon/features/auth/presentation/pages/send_code.dart';
 import 'package:sairon/features/cart/data/repository/cart_repository_impl.dart';
 import 'package:sairon/features/cart/domain/usecase/cart_usecases.dart';
 import 'package:sairon/features/cart/presentation/bloc/cart_bloc.dart';
 import 'package:sairon/features/product/domain/entities/product_entity.dart';
 import 'package:sairon/features/product/presentation/widgets/recommended_products.dart';
 import 'package:get/get.dart';
-
 import '../../domain/entities/variants.dart';
+import '../widgets/appbar_back_button.dart';
+import '../widgets/discount_label.dart';
 import '../widgets/product_info.dart';
 import '../widgets/product_main_image.dart';
 import '../widgets/rate.dart';
@@ -165,7 +164,26 @@ class _ProductDetailsState extends State<ProductDetails> {
                     duration: const Duration(milliseconds: 300),
                     transitionBuilder: (child, anim) =>
                         ScaleTransition(scale: anim, child: child),
-                    child: !inCart
+                    child: widget.productEntity.stock == '0'
+                        ? Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.textSecondary,
+                              borderRadius: Constants.primaryRadius,
+                            ),
+                            child: Text(
+                              'ناموجود',
+                              style: TextStyle(
+                                color: AppColors.backgroundColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          )
+                        : !inCart
                         ? FloatingActionButton.extended(
                             key: const ValueKey('addButton'),
                             onPressed: isLoading
@@ -327,66 +345,6 @@ class _ProductDetailsState extends State<ProductDetails> {
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class AppBarBackButton extends StatelessWidget {
-  const AppBarBackButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      right: 24,
-      top: 8,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: Constants.primaryRadius,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: const BackButton(),
-      ),
-    );
-  }
-}
-
-class DiscountLabel extends StatelessWidget {
-  const DiscountLabel({super.key, required this.discount});
-  final String discount;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 24,
-      top: 12,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        decoration: BoxDecoration(
-          gradient: GradientTheme.primaryGradient,
-          borderRadius: Constants.primaryRadius,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.deepPurple.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Text(
-          '%$discount تخفیف',
-          style: const TextStyle(
-            color: AppColors.backgroundColor,
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ),
     );

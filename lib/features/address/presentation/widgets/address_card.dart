@@ -9,6 +9,7 @@ class AddressCard extends StatelessWidget {
   final VoidCallback onSetDefault;
   final bool isSelected;
   final bool isLoading;
+  final bool isCheckout;
 
   const AddressCard({
     super.key,
@@ -18,12 +19,13 @@ class AddressCard extends StatelessWidget {
     required this.onSetDefault,
     this.isSelected = false,
     this.isLoading = false,
+    this.isCheckout = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      ignoring: isLoading, // هنگام عملیات، کارت غیر قابل کلیک
+      ignoring: isLoading,
       child: Stack(
         children: [
           Container(
@@ -52,17 +54,17 @@ class AddressCard extends StatelessWidget {
                   _buildReceiverInfo(),
                   const SizedBox(height: 10),
                   _buildAddressInfo(),
-                  const SizedBox(height: 16),
-                  _buildActions(context),
+                  if (!isCheckout) ...[
+                    const SizedBox(height: 16),
+                    _buildActions(context),
+                  ],
                 ],
               ),
             ),
           ),
 
-          /// ستاره پیش‌فرض
           if (address.isDefault) _buildDefaultIcon(),
 
-          /// لودینگ روی کارت
           if (isLoading) _buildLoading(),
         ],
       ),

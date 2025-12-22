@@ -5,8 +5,6 @@ abstract class OrderState extends Equatable {
   List<Object?> get props => [];
 }
 
-class OrderInitial extends OrderState {}
-
 class OrderLoading extends OrderState {}
 
 class OrderError extends OrderState {
@@ -45,7 +43,7 @@ class OrderCreated extends OrderState {
 class OrderCancelled extends OrderState {}
 
 class ShippingCalculated extends OrderState {
-  final ShippingInfoModel? shipping;
+  final OrderPreviewModel? shipping;
   ShippingCalculated(this.shipping);
 
   @override

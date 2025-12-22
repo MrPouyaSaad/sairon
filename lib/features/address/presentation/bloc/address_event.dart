@@ -42,3 +42,12 @@ final class EditAddress extends AddressEvent {
   @override
   List<Object> get props => [addressEntity];
 }
+
+class SelectAddress extends AddressEvent {
+  final String addressId;
+
+  const SelectAddress(this.addressId);
+
+  @override
+  List<Object> get props => [addressId];
+}

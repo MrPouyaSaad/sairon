@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sairon/features/address/domain/entities/address.dart';
+import '../../../address/presentation/pages/address_page.dart';
+import '../../../order/presentation/pages/payment_page.dart';
 import 'cart_page.dart';
-import 'checkout_page.dart';
-import 'payment_page.dart';
 import 'package:sairon/core/widgets/gradient.dart';
 
 class CartFlowScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _CartFlowScreenState extends State<CartFlowScreen> {
 
   void _updateStepByRoute(String routeName) {
     int newStep = 0;
-    if (routeName.contains('checkout')) newStep = 1;
+    if (routeName.contains('address')) newStep = 1;
     if (routeName.contains('payment')) newStep = 2;
 
     if (currentStep != newStep) {
@@ -31,11 +32,11 @@ class _CartFlowScreenState extends State<CartFlowScreen> {
     late Widget page;
 
     switch (settings.name) {
-      case '/checkout':
-        page = const CheckoutPage();
+      case '/address':
+        page = AddressPage(isCheckout: true);
         break;
       case '/payment':
-        page = const PaymentPage();
+        page = PaymentPage(addressEntity: settings.arguments as AddressEntity);
         break;
       case '/cart':
       default:

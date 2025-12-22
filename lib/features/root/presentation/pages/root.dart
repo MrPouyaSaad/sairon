@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sairon/core/themes/app_colors.dart';
+import 'package:sairon/core/widgets/badge.dart';
+import 'package:sairon/features/cart/data/repository/cart_repository_impl.dart';
 
 import '../../../cart/presentation/pages/cart_flow.dart';
 import '../../../home/presentation/pages/home.dart';
@@ -94,10 +96,16 @@ class _RootScreenState extends State<RootScreen> {
             selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
             showSelectedLabels: true,
             showUnselectedLabels: true,
-            items: const [
+            items: [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'خانه'),
               BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
+                icon: ValueListenableBuilder(
+                  valueListenable: cartRepository.cartNotifier,
+                  builder: (context, value, child) => SuperAnimatedBadge(
+                    value: value == null ? 0 : value.totalQuantity,
+                    child: Icon(Icons.shopping_cart),
+                  ),
+                ),
                 label: 'سبد خرید',
               ),
               BottomNavigationBarItem(

@@ -14,14 +14,14 @@ class AddressModel extends AddressEntity {
   });
   AddressModel.fromJson(Map<String, dynamic> json)
     : super(
-        id: json['id'],
-        title: json['title'],
+        id: json['id'] ?? 0,
+        title: json['title'] ?? 'بدون عنوان',
         receiver: json['receiver'],
         phoneNumber: json['phone'],
         province: json['province'],
         city: json['city'],
         address: json['address'],
         postalCode: json['postalCode'],
-        isDefault: json['isDefault'],
+        isDefault: json['isDefault'] ?? false,
       );
 }

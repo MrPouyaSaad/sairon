@@ -11,9 +11,13 @@ import 'package:sairon/features/address/presentation/widgets/province_city_selec
 import '../../../../core/widgets/gradient_appbar.dart';
 
 class AddAddressPage extends StatefulWidget {
-  const AddAddressPage({super.key, this.addressEntity});
+  const AddAddressPage({
+    super.key,
+    this.addressEntity,
+    this.isCheckout = false,
+  });
   final AddressEntity? addressEntity;
-
+  final bool isCheckout;
   @override
   State<AddAddressPage> createState() => _AddAddressPageState();
 }
@@ -70,12 +74,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
       backgroundColor: colors.surfaceVariant.withOpacity(0.95),
       body: Column(
         children: [
-          GradientAppBar(
-            title: widget.addressEntity == null ? 'آدرس جدید' : 'ویرایش آدرس',
-            actions: widget.addressEntity != null
-                ? [_buildDeleteButton(colors)]
-                : null,
-          ),
+          if (!widget.isCheckout)
+            GradientAppBar(
+              title: widget.addressEntity == null ? 'آدرس جدید' : 'ویرایش آدرس',
+              actions: widget.addressEntity != null
+                  ? [_buildDeleteButton(colors)]
+                  : null,
+            ),
 
           Expanded(
             child: SingleChildScrollView(
@@ -163,33 +168,111 @@ class _AddAddressPageState extends State<AddAddressPage> {
                   ),
 
                   const SizedBox(height: 30),
+                  BlocListener<AddressBloc, AddressState>(
+                    listenWhen: (prev, curr) =>
+                        prev.operationStatus != curr.operationStatus,
+                    listener: (context, state) {
+                      if (state.operationStatus ==
+                          AddressOperationStatus.success) {
+                        Get.snackbar(
+                          "✅ موفقیت",
+                          "آدرس با موفقیت ذخیره شد",
+                          snackPosition: SnackPosition.TOP,
+                          backgroundColor: Color(0xFF10B981),
+                          colorText: Colors.white,
+                          borderRadius: 16,
+                          margin: EdgeInsets.all(16),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                          duration: Duration(seconds: 3),
+                          animationDuration: Duration(milliseconds: 500),
+                          titleText: Text(
+                            "موفقیت",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Yekan',
+                            ),
+                          ),
+                          messageText: Text(
+                            "آدرس با موفقیت ذخیره شد",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 14,
+                              fontFamily: 'Yekan',
+                            ),
+                          ),
+                          boxShadows: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                          snackStyle: SnackStyle.FLOATING,
+                        );
+                        Navigator.of(context).pop();
+                      }
 
-                  BlocBuilder<AddressBloc, AddressState>(
-                    builder: (context, state) {
-                      return GradientButton(
-                        onPressed: () {
-                          if (widget.addressEntity != null) {
-                            BlocProvider.of<AddressBloc>(context).add(
-                              EditAddress(
-                                addressEntity: AddressEntity(
-                                  id: widget.addressEntity!.id,
-
-                                  title: _titleController.text,
-                                  receiver: _receiverController.text,
-                                  province: _selectedProvince!,
-                                  city: _selectedCity!,
-                                  postalCode: _postalCodeController.text,
-                                  phoneNumber: _phoneController.text,
-                                  address: _addressController.text,
-                                  isDefault: _isDefault,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        text: 'ذخیره آدرس',
-                      );
+                      if (state.operationStatus ==
+                          AddressOperationStatus.error) {
+                        Get.snackbar(
+                          "خطا",
+                          state.operationMessage ?? "مشکلی رخ داد",
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                        );
+                      }
                     },
+                    child: BlocBuilder<AddressBloc, AddressState>(
+                      builder: (context, state) {
+                        final isLoading =
+                            state.operationStatus ==
+                            AddressOperationStatus.loading;
+                        return GradientButton(
+                          onPressed: () {
+                            if (widget.addressEntity != null) {
+                              BlocProvider.of<AddressBloc>(context).add(
+                                EditAddress(
+                                  addressEntity: AddressEntity(
+                                    id: widget.addressEntity!.id,
+                                    title: _titleController.text,
+                                    receiver: _receiverController.text,
+                                    province: _selectedProvince!,
+                                    city: _selectedCity!,
+                                    postalCode: _postalCodeController.text,
+                                    phoneNumber: _phoneController.text,
+                                    address: _addressController.text,
+                                    isDefault: _isDefault,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              BlocProvider.of<AddressBloc>(context).add(
+                                AddAddress(
+                                  addressEntity: AddressEntity(
+                                    id: 1,
+                                    title: _titleController.text,
+                                    receiver: _receiverController.text,
+                                    province: _selectedProvince!,
+                                    city: _selectedCity!,
+                                    postalCode: _postalCodeController.text,
+                                    phoneNumber: _phoneController.text,
+                                    address: _addressController.text,
+                                    isDefault: _isDefault,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+
+                          text: isLoading ? 'درحال ذخیره ...' : 'ذخیره آدرس',
+                        );
+                      },
+                    ),
                   ),
                 ],
               ).marginSymmetric(horizontal: 16, vertical: 24),

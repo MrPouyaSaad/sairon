@@ -7,6 +7,7 @@ import 'package:sairon/core/utils/extensions.dart';
 import 'package:sairon/core/widgets/gradient.dart';
 import 'package:sairon/core/widgets/image_loading.dart';
 import 'package:sairon/features/product/domain/entities/product_entity.dart';
+import 'package:sairon/features/product/presentation/pages/product_details.dart';
 
 class HorizontalProductCard extends StatelessWidget {
   const HorizontalProductCard({super.key, required this.productEntity});
@@ -16,26 +17,31 @@ class HorizontalProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDiscounted = double.parse(productEntity.discount) > 0;
 
-    return Container(
-      width: 270,
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildProductImage(isDiscounted),
+    return GestureDetector(
+      onTap: () {
+        Get.to(ProductDetails(productEntity: productEntity));
+      },
+      child: Container(
+        width: 270,
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _buildProductImage(isDiscounted),
 
-          Expanded(child: _buildProductInfo(isDiscounted)),
-        ],
+            Expanded(child: _buildProductInfo(isDiscounted)),
+          ],
+        ),
       ),
     );
   }
@@ -90,7 +96,6 @@ class HorizontalProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // عنوان و توضیحات
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -102,79 +107,35 @@ class HorizontalProductCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const Gap(4),
+              const Gap(6),
               Text(
-                'توضیحات کوتاه محصول...',
+                productEntity.description,
                 style: AppTextStyles.caption.copyWith(color: Colors.grey[600]),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-
-          // قیمت و دکمه
-          Column(
+          const Gap(8),
+          Row(
             children: [
-              // قیمت
-              Row(
-                children: [
-                  Text(
-                    productEntity
-                        .discountedPrice
-                        .formattedStringPrice
-                        .withPriceLable,
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1E3A8A),
-                    ),
+              if (isDiscounted)
+                Text(
+                  productEntity.orginalPrice.formattedStringPrice,
+                  style: AppTextStyles.caption.copyWith(
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey[500],
                   ),
-
-                  const Spacer(),
-
-                  if (isDiscounted)
-                    Text(
-                      productEntity.orginalPrice.formattedStringPrice,
-                      style: AppTextStyles.caption.copyWith(
-                        decoration: TextDecoration.lineThrough,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                ],
-              ),
-
-              const Gap(8),
-
-              // دکمه افزودن به سبد
-              Container(
-                height: 32,
-                decoration: BoxDecoration(
-                  gradient: GradientTheme.buttonGradient,
-                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap: _addToCart,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.add_shopping_cart_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                        const Gap(4),
-                        Text(
-                          'افزودن',
-                          style: AppTextStyles.caption.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+              const Spacer(),
+              Text(
+                productEntity
+                    .discountedPrice
+                    .formattedStringPrice
+                    .withPriceLable,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1E3A8A),
                 ),
               ),
             ],
@@ -182,9 +143,5 @@ class HorizontalProductCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  void _addToCart() {
-    // TODO: Add to cart logic
   }
 }

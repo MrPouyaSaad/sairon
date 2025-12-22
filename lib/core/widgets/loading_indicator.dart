@@ -25,6 +25,16 @@ class ButtonLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: CircularProgressIndicator());
+    return SpinKitFadingCircle(
+      size: 25,
+      itemBuilder: (BuildContext context, int index) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.textSecondary,
+            shape: BoxShape.circle,
+          ),
+        );
+      },
+    );
   }
 }

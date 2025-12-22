@@ -12,7 +12,7 @@ final cartRepository = CartRepositoryImpl(dataSource: _dataSource);
 
 class CartRepositoryImpl implements CartRepository {
   final CartDataSource dataSource;
-  final ValueNotifier<CartEntity?> itemCountNotifier = ValueNotifier(null);
+  final ValueNotifier<CartEntity?> cartNotifier = ValueNotifier(null);
 
   CartRepositoryImpl({required this.dataSource});
 

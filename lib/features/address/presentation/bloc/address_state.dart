@@ -3,21 +3,22 @@ part of 'address_bloc.dart';
 enum AddressOperationStatus { idle, loading, success, error }
 
 class AddressState extends Equatable {
-  final bool isLoading; // فقط برای لود اولیه لیست
+  final bool isLoading;
   final List<AddressEntity> addresses;
   final AddressOperationStatus operationStatus;
-  final String? operationMessage; // برای خطا یا موفقیت
-  final String? workingAddressId; // برای remove / setDefault / edit
+  final String? operationMessage;
+  final String? workingAddressId;
+  final String? selectedAddressId;
 
   const AddressState({
     required this.isLoading,
     required this.addresses,
     required this.operationStatus,
+    this.selectedAddressId,
     this.operationMessage,
     this.workingAddressId,
   });
 
-  /// حالت اولیه
   factory AddressState.initial() => const AddressState(
     isLoading: true,
     addresses: [],
@@ -32,10 +33,13 @@ class AddressState extends Equatable {
     AddressOperationStatus? operationStatus,
     String? operationMessage,
     String? workingAddressId,
+    final String? selectedAddressId,
   }) {
     return AddressState(
       isLoading: isLoading ?? this.isLoading,
       addresses: addresses ?? this.addresses,
+      selectedAddressId: selectedAddressId ?? this.selectedAddressId,
+
       operationStatus: operationStatus ?? this.operationStatus,
       operationMessage: operationMessage,
       workingAddressId: workingAddressId,
@@ -47,6 +51,7 @@ class AddressState extends Equatable {
     isLoading,
     addresses,
     operationStatus,
+    selectedAddressId,
     operationMessage,
     workingAddressId,
   ];

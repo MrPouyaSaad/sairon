@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:sairon/core/constants/api/app_routes.dart';
-import 'package:sairon/features/cart/data/model/shipping_info_model.dart';
 import 'package:sairon/features/order/data/models/order_model.dart';
+
+import '../models/cart_validation_model.dart';
+import '../models/order_preview_model.dart';
 
 abstract class OrderRemoteDataSource {
   Future<List<OrderModel>> fetchOrders({
@@ -20,17 +22,17 @@ abstract class OrderRemoteDataSource {
     String? postalCode,
   });
   Future<void> cancelOrder(String orderId);
-  Future<ShippingInfoModel> calculateShipping({
+  Future<CartValidationModel> validateCart();
+  Future<OrderPreviewModel> calculateOrderPreview({
     required String province,
     required String city,
-    double subtotal = 0,
-    String shippingMethod = 'standard',
   });
 
   Future<Map<String, dynamic>> getPaymentToken({
     required String orderId,
     required double amount,
     required String phone,
+    required String redirectUrl,
   });
   Future<Map<String, dynamic>> verifyPayment({
     required String orderId,
@@ -100,22 +102,21 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
   }
 
   @override
-  Future<ShippingInfoModel> calculateShipping({
+  Future<CartValidationModel> validateCart() async {
+    final res = await httpClient.post('/api/orders/validate-cart');
+    return CartValidationModel.fromJson(res.data['data']);
+  }
+
+  @override
+  Future<OrderPreviewModel> calculateOrderPreview({
     required String province,
     required String city,
-    double subtotal = 0,
-    String shippingMethod = 'standard',
   }) async {
     final res = await httpClient.post(
-      '/api/orders/shipping/calculate',
-      data: {
-        'province': province,
-        'city': city,
-        'subtotal': subtotal,
-        'shippingMethod': shippingMethod,
-      },
+      '/api/orders/preview',
+      data: {'province': province, 'city': city},
     );
-    return ShippingInfoModel.fromJson(res.data['data']);
+    return OrderPreviewModel.fromJson(res.data['data']);
   }
 
   @override
@@ -123,11 +124,21 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
     required String orderId,
     required double amount,
     required String phone,
+    required String redirectUrl,
   }) async {
     final res = await httpClient.post(
       AppRoutes.payment.create,
-      data: {'orderId': orderId, 'amount': amount, 'phone': phone},
+      data: {
+        'orderId': orderId,
+        'amount': amount,
+        'phone': phone,
+        redirectUrl: "sairon://payment-result",
+      },
     );
+
+    if (res.headers.value('content-type')?.contains('text/html') == true) {
+      return {'html': res.data, 'paymentUrl': null, 'token': null};
+    }
     return res.data['data'];
   }
 

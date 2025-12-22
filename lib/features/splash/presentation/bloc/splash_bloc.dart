@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sairon/core/errors/exception_helper.dart';
+import 'package:sairon/features/cart/data/repository/cart_repository_impl.dart';
 import 'package:sairon/features/cart/domain/usecase/cart_usecases.dart';
 import 'package:sairon/features/auth/data/repositories/token_repo.dart';
 
@@ -23,7 +24,6 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
     try {
       final isLoggedIn = TokenRepository.isLoggedIn;
-      int cartItemsCount = 0;
 
       if (isLoggedIn) {
         final cartResult = await cartUsecase.getCartItems();
@@ -31,7 +31,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
         if (failure != null) {
           if (requiresLogout(failure)) {
-            emit(SplashSuccess(cartItemsCount: 0, isUserLoggedIn: false));
+            emit(SplashSuccess(isUserLoggedIn: false));
             return;
           }
           emit(SplashError(message: failure.message));
@@ -39,15 +39,10 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
         }
 
         final cart = extractRight(cartResult);
-        cartItemsCount = cart?.totalQuantity ?? 0;
+        cartRepository.cartNotifier.value = cart;
       }
 
-      emit(
-        SplashSuccess(
-          cartItemsCount: cartItemsCount,
-          isUserLoggedIn: isLoggedIn,
-        ),
-      );
+      emit(SplashSuccess(isUserLoggedIn: isLoggedIn));
     } catch (error) {
       emit(SplashError(message: 'خطا در بارگذاری اطلاعات اولیه'));
     }

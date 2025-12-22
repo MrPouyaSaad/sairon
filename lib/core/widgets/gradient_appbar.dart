@@ -14,6 +14,7 @@ class GradientAppBar extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final double? height;
   final Gradient? gradient;
+  final double textSize;
   const GradientAppBar({
     super.key,
     required this.title,
@@ -24,6 +25,7 @@ class GradientAppBar extends StatelessWidget {
     this.gradientColors,
     this.textColor,
     this.borderRadius,
+    this.textSize = 24,
     this.padding,
     this.height = 140,
     this.gradient,
@@ -61,7 +63,7 @@ class GradientAppBar extends StatelessWidget {
             child: Text(
               title,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: textSize,
                 fontWeight: FontWeight.w800,
                 color: textColor ?? colors.onPrimary,
               ),

@@ -12,16 +12,12 @@ class SplashInitial extends SplashState {}
 class SplashLoading extends SplashState {}
 
 class SplashSuccess extends SplashState {
-  final int cartItemsCount;
   final bool isUserLoggedIn;
 
-  const SplashSuccess({
-    required this.cartItemsCount,
-    required this.isUserLoggedIn,
-  });
+  const SplashSuccess({required this.isUserLoggedIn});
 
   @override
-  List<Object> get props => [cartItemsCount, isUserLoggedIn];
+  List<Object> get props => [isUserLoggedIn];
 }
 
 class SplashError extends SplashState {

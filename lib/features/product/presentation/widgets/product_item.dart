@@ -1,6 +1,5 @@
 // lib/features/product/presentation/widgets/modern_product_card.dart
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:sairon/core/constants/app_constants.dart';
 import 'package:sairon/core/themes/app_colors.dart';

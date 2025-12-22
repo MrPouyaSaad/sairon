@@ -5,6 +5,8 @@ import 'package:sairon/core/widgets/app_list_title.dart';
 import 'package:sairon/features/category/domain/entities/category_entity.dart';
 import 'package:sairon/features/category/presentation/widgets/category_item.dart';
 
+import '../../../product/presentation/pages/products_list_page.dart';
+
 class CategoryList extends StatelessWidget {
   const CategoryList({super.key, required this.categoryList});
   final List<CategoryEntity> categoryList;
@@ -29,7 +31,10 @@ class CategoryList extends StatelessWidget {
           ),
           itemCount: categoryList.length,
           itemBuilder: (context, index) {
-            return CategoryItem(categoryEntity: categoryList[index]);
+            return CategoryItem(
+              categoryEntity: categoryList[index],
+              onTap: () => Get.to(ProductScreen(category: categoryList[index])),
+            );
           },
         ),
       ],

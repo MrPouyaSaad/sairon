@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sairon/core/errors/exception_helper.dart';
 import 'package:sairon/features/cart/data/repository/cart_repository_impl.dart';
@@ -86,7 +85,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
     final data = extractRight(cart);
 
-    cartRepository.itemCountNotifier.value = data;
+    cartRepository.cartNotifier.value = data;
 
     emit(CartLoaded(cart: data));
   }

@@ -2,11 +2,12 @@ import 'package:dartz/dartz.dart';
 import 'package:sairon/core/constants/api/api_constants.dart';
 import 'package:sairon/core/errors/exception_mapper.dart';
 import 'package:sairon/core/errors/failures.dart';
-import 'package:sairon/features/cart/data/model/shipping_info_model.dart';
+import 'package:sairon/features/order/data/models/cart_validation_model.dart';
 import 'package:sairon/features/order/data/models/order_model.dart';
 
 import '../../domain/repositories/order_repo.dart';
 import '../datasources/order_datasource.dart';
+import '../models/order_preview_model.dart';
 
 final _dataSource = OrderRemoteDataSourceImpl(ApiConstants.httpClient);
 final orderRepository = OrderRepositoryImpl(_dataSource);
@@ -61,56 +62,33 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Future<Either<Failure, ShippingInfoModel>> calculateShipping({
-    required String province,
-    required String city,
-    double subtotal = 0,
-    String shippingMethod = 'standard',
-  }) async {
-    return safeCall(
-      () => dataSource.calculateShipping(
-        province: province,
-        city: city,
-        subtotal: subtotal,
-        shippingMethod: shippingMethod,
-      ),
-    );
+  Future<Either<Failure, CartValidationModel>> validateCart() async {
+    return safeCall(() => dataSource.validateCart());
   }
 
-  // @override
-  // Future<Either<Failure, OrderStatsModel>> fetchOrderStats() async {
-  //   return safeCall(() => dataSource.fetchOrderStats());
-  // }
-
-  // @override
-  // Future<Either<Failure, OrderPreviewModel>> validateCart() async {
-  //   return safeCall(() => dataSource.validateCart());
-  // }
-
-  // @override
-  // Future<Either<Failure, OrderPreviewModel>> calculateOrderPreview({
-  //   String? province,
-  //   String? city,
-  // }) async {
-  //   return safeCall(
-  //     () => dataSource.calculateOrderPreview(
-  //       province: province,
-  //       city: city,
-  //     ),
-  //   );
-  // }
+  @override
+  Future<Either<Failure, OrderPreviewModel>> calculateOrderPreview({
+    required String province,
+    required String city,
+  }) async {
+    return safeCall(
+      () => dataSource.calculateOrderPreview(province: province, city: city),
+    );
+  }
 
   @override
   Future<Either<Failure, Map<String, dynamic>>> getPaymentToken({
     required String orderId,
     required double amount,
     required String phone,
+    required String redirectUrl,
   }) async {
     return safeCall(
       () => dataSource.getPaymentToken(
         orderId: orderId,
         amount: amount,
         phone: phone,
+        redirectUrl: redirectUrl,
       ),
     );
   }

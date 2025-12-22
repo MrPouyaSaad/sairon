@@ -16,3 +16,12 @@ class FetchRecommendedProducts extends ProductEvent {
   @override
   List<Object> get props => [productId, page];
 }
+
+class FetchProductsByCategory extends ProductEvent {
+  final int categoryId;
+  final int page;
+
+  const FetchProductsByCategory({required this.categoryId, this.page = 1});
+  @override
+  List<Object> get props => [categoryId, page];
+}

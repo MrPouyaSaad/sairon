@@ -168,6 +168,7 @@ class SplashLoadingIndicator extends StatelessWidget {
         ),
         textColor: Colors.orange[300]!,
         showError: true,
+        showRetry: true,
       );
     }
 
@@ -190,7 +191,7 @@ class _LoadingData {
     required this.text,
     required this.progressGradient,
     required this.textColor,
-    this.showError = false,
     this.showRetry = false,
+    this.showError = false,
   });
 }

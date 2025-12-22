@@ -28,82 +28,95 @@ class CartPage extends StatelessWidget {
                   'برای مشاهده سبد خرید و ادامه فرآیند خرید، لطفاً وارد حساب کاربری خود شوید!',
             );
           } else {
-            return BlocProvider(
-              create: (context) {
-                final bloc = CartBloc(CartUsecases(repository: cartRepository));
-                bloc.add(CartStarted());
-                return bloc;
-              },
-              child: SafeArea(
-                child: BlocBuilder<CartBloc, CartState>(
-                  builder: (context, state) {
-                    if (state is CartLoading || state is CartInitial) {
-                      return ScreenLoadingIndicator();
-                    } else if (state is CartError) {
-                      return AppErrorWidget(
-                        message: state.message,
-                        onRetry: () {
-                          BlocProvider.of<CartBloc>(context).add(CartStarted());
-                        },
-                      );
-                    } else if (state is CartLoaded) {
-                      if (state.cart!.items.isEmpty) {
-                        return EmptyCartScreen();
-                      } else {
-                        return Stack(
-                          children: [
-                            ListView.separated(
-                              itemCount: 2, // CartItemList , CartTotalWidget
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 16),
-                              itemBuilder: (context, index) {
-                                if (index == 0) {
-                                  return CartItemList(items: state.cart!.items);
-                                } else {
-                                  return CartTotalWidget(cart: state.cart!);
-                                }
-                              },
-                            ),
-                            Positioned(
-                              bottom: 16,
-                              left: 24,
-                              right: 24,
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(
-                                      context,
-                                    ).pushNamed('/checkout');
+            return ValueListenableBuilder(
+              valueListenable: cartRepository.cartNotifier,
+              builder: (context, value, child) {
+                return BlocProvider(
+                  create: (context) {
+                    final bloc = CartBloc(
+                      CartUsecases(repository: cartRepository),
+                    );
+                    bloc.add(CartStarted());
+                    return bloc;
+                  },
+                  child: SafeArea(
+                    child: BlocBuilder<CartBloc, CartState>(
+                      builder: (context, state) {
+                        if (state is CartLoading || state is CartInitial) {
+                          return ScreenLoadingIndicator();
+                        } else if (state is CartError) {
+                          return AppErrorWidget(
+                            message: state.message,
+                            onRetry: () {
+                              BlocProvider.of<CartBloc>(
+                                context,
+                              ).add(CartStarted());
+                            },
+                          );
+                        } else if (state is CartLoaded) {
+                          if (state.cart!.items.isEmpty) {
+                            return EmptyCartScreen();
+                          } else {
+                            return Stack(
+                              children: [
+                                ListView.separated(
+                                  padding: EdgeInsets.only(bottom: 16),
+                                  itemCount:
+                                      2, // CartItemList , CartTotalWidget
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 16),
+                                  itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return CartTotalWidget(cart: state.cart!);
+                                    } else {
+                                      return CartItemList(
+                                        items: state.cart!.items,
+                                      );
+                                    }
                                   },
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ),
-                                    backgroundColor: AppColors.primaryColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: Constants.primaryRadius,
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'ادامه خرید',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                ),
+                                Positioned(
+                                  bottom: 16,
+                                  left: 24,
+                                  right: 24,
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(
+                                          context,
+                                        ).pushNamed('/address');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
+                                        backgroundColor: AppColors.primaryColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: Constants.primaryRadius,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'ادامه خرید',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                    } else {
-                      throw 'مشکلی در بارگیری این صفح رخ داد!';
-                    }
-                  },
-                ),
-              ),
+                              ],
+                            );
+                          }
+                        } else {
+                          throw 'مشکلی در بارگیری این صفح رخ داد!';
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
             );
           }
         },

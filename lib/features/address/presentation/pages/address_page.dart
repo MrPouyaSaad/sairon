@@ -1,6 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:get/get.dart';
+import 'package:sairon/core/constants/app_constants.dart';
+import 'package:sairon/core/themes/app_colors.dart';
 import 'package:sairon/core/widgets/app_textfield.dart';
 import 'package:sairon/core/widgets/error_widget.dart';
 import 'package:sairon/core/widgets/gradient_appbar.dart';
@@ -16,19 +21,15 @@ import '../../../../core/widgets/gradient.dart';
 import '../widgets/empty_address.dart';
 
 class AddressPage extends StatefulWidget {
-  const AddressPage({super.key});
-
+  const AddressPage({this.isCheckout = false, super.key});
+  final bool isCheckout;
   @override
   State<AddressPage> createState() => _AddressPageState();
 }
 
 class _AddressPageState extends State<AddressPage> {
   final TextEditingController controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  String? _selectedAddressId;
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +41,14 @@ class _AddressPageState extends State<AddressPage> {
         backgroundColor: Colors.grey[50],
         body: Column(
           children: [
-            GradientAppBar(
-              title: 'آدرس‌های من',
-              gradient: GradientTheme.primaryGradient,
-            ),
+            if (!widget.isCheckout)
+              GradientAppBar(
+                title: 'آدرس‌های من',
+                gradient: GradientTheme.primaryGradient,
+              ),
             Expanded(
               child: BlocConsumer<AddressBloc, AddressState>(
                 listener: (context, state) {
-                  // مدیریت پیام‌های موفقیت‌آمیز
                   if (state.operationStatus == AddressOperationStatus.success) {
                     if (state.operationMessage?.isNotEmpty == true) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +60,6 @@ class _AddressPageState extends State<AddressPage> {
                     }
                   }
 
-                  // مدیریت خطاها
                   if (state.operationStatus == AddressOperationStatus.error) {
                     if (state.operationMessage?.isNotEmpty == true) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,6 +69,15 @@ class _AddressPageState extends State<AddressPage> {
                         ),
                       );
                     }
+                  }
+
+                  if (state.addresses.isNotEmpty &&
+                      _selectedAddressId == null) {
+                    final defaultAddress = state.addresses.firstWhere(
+                      (address) => address.isDefault,
+                      orElse: () => state.addresses.first,
+                    );
+                    _selectedAddressId = defaultAddress.id.toString();
                   }
                 },
                 builder: (context, state) {
@@ -87,16 +96,105 @@ class _AddressPageState extends State<AddressPage> {
                   } else {
                     if (state.addresses.isEmpty) {
                       return EmptyAddresses(
-                        onAddAddress: () => _navigateToAddAddress(context),
+                        onAddAddress: () =>
+                            _navigateToAddAddress(context, widget.isCheckout),
                       );
                     } else {
-                      return _buildList(state.addresses, state, context);
+                      return _buildList(
+                        state.addresses,
+                        state,
+                        context,
+                        widget.isCheckout,
+                      );
                     }
                   }
                 },
               ),
             ),
           ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: BlocBuilder<AddressBloc, AddressState>(
+          buildWhen: (previous, current) =>
+              previous.addresses != current.addresses,
+          builder: (context, state) {
+            AddressEntity? selectedAddress;
+
+            if (_selectedAddressId != null) {
+              selectedAddress = state.addresses.firstWhere(
+                (address) => address.id.toString() == _selectedAddressId,
+                orElse: () => state.addresses.firstWhere(
+                  (address) => address.isDefault,
+                  orElse: () => state.addresses.first,
+                ),
+              );
+            } else if (state.addresses.isNotEmpty) {
+              selectedAddress = state.addresses.firstWhere(
+                (address) => address.isDefault,
+                orElse: () => state.addresses.first,
+              );
+            }
+
+            return Row(
+              children: [
+                FloatingActionButton(
+                  backgroundColor: AppColors.backgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: Constants.primaryRadius,
+                    side: BorderSide(width: 2, color: AppColors.primaryColor),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: AppColors.primaryColor,
+                    size: 26,
+                  ),
+                ),
+                Gap(16),
+                Expanded(
+                  child: FloatingActionButton(
+                    onPressed: selectedAddress == null
+                        ? () {
+                            log('Selected address is null');
+                            Get.showSnackbar(
+                              GetSnackBar(
+                                message: 'لطفاً یک آدرس را انتخاب کنید',
+                                duration: Duration(seconds: 2),
+                                snackPosition: SnackPosition.TOP,
+                                backgroundColor: Colors.red,
+                                borderRadius: 10,
+                                margin: EdgeInsets.all(10),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
+                              ),
+                            );
+                          }
+                        : () {
+                            log('Selected address: ${selectedAddress?.id}');
+                            Navigator.of(
+                              context,
+                            ).pushNamed('/payment', arguments: selectedAddress);
+                          },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'ادامه خرید',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward, size: 26),
+                      ],
+                    ).paddingSymmetric(horizontal: 12),
+                  ),
+                ),
+              ],
+            ).marginSymmetric(horizontal: 16);
+          },
         ),
       ),
     );
@@ -106,6 +204,7 @@ class _AddressPageState extends State<AddressPage> {
     List<AddressEntity> addresses,
     AddressState state,
     BuildContext context,
+    bool isCheckout,
   ) {
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -124,7 +223,7 @@ class _AddressPageState extends State<AddressPage> {
               ),
               const Gap(12),
               GradientButton(
-                onPressed: () => _navigateToAddAddress(context),
+                onPressed: () => _navigateToAddAddress(context, isCheckout),
                 text: 'افزودن آدرس',
                 shadow: false,
                 padding: const EdgeInsets.symmetric(
@@ -151,16 +250,39 @@ class _AddressPageState extends State<AddressPage> {
                               AddressOperationStatus.loading
                     : false;
 
-                return AddressCard(
-                  address: address,
-                  isLoading: isWorking,
-                  onEdit: () => _editAddress(address, context),
-                  onDelete: () => BlocProvider.of<AddressBloc>(
-                    context,
-                  ).add(RemoveAddress(addressId: address.id.toString())),
-                  onSetDefault: () => BlocProvider.of<AddressBloc>(
-                    context,
-                  ).add(SetAsDefault(addressId: address.id.toString())),
+                return GestureDetector(
+                  onTap: () {
+                    if (isCheckout) {
+                      setState(() {
+                        _selectedAddressId = address.id.toString();
+                      });
+                      context.read<AddressBloc>().add(
+                        SelectAddress(address.id.toString()),
+                      );
+                    }
+                  },
+                  child: BlocBuilder<AddressBloc, AddressState>(
+                    buildWhen: (previous, current) =>
+                        previous.selectedAddressId != current.selectedAddressId,
+                    builder: (context, state) {
+                      final isSelected =
+                          _selectedAddressId == address.id.toString();
+
+                      return AddressCard(
+                        address: address,
+                        isLoading: isWorking,
+                        isCheckout: isCheckout,
+                        isSelected: isSelected,
+                        onEdit: () => _editAddress(address, context),
+                        onDelete: () => context.read<AddressBloc>().add(
+                          RemoveAddress(addressId: address.id.toString()),
+                        ),
+                        onSetDefault: () => context.read<AddressBloc>().add(
+                          SetAsDefault(addressId: address.id.toString()),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
@@ -170,13 +292,13 @@ class _AddressPageState extends State<AddressPage> {
     );
   }
 
-  void _navigateToAddAddress(BuildContext context) {
+  void _navigateToAddAddress(BuildContext context, bool isCheckout) {
     final addressBloc = BlocProvider.of<AddressBloc>(context);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => BlocProvider.value(
           value: addressBloc,
-          child: const AddAddressPage(),
+          child: AddAddressPage(isCheckout: isCheckout),
         ),
       ),
     );

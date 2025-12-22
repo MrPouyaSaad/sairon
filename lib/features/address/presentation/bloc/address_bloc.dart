@@ -16,6 +16,9 @@ class AddressBloc extends Bloc<AddressEvent, AddressState> {
     on<AddAddress>(_addAddress);
     on<EditAddress>(_editAddress);
     on<SetAsDefault>(_setDefault);
+    on<SelectAddress>((event, emit) {
+      emit(state.copyWith(selectedAddressId: event.addressId));
+    });
   }
 
   Future<void> _loadList(

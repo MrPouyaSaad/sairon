@@ -7,9 +7,9 @@ import 'variant_model.dart';
 class ProductModel extends ProductEntity {
   ProductModel.fromJson(Map<String, dynamic> json)
     : super(
-        id: json['id'] as int,
-        name: json['name'] as String,
-        description: json['description'] as String,
+        id: json['id'] as int? ?? 0,
+        name: json['name'] as String? ?? '',
+        description: json['description'] as String? ?? '',
         orginalPrice: (json['price']?.toString() ?? '0'),
         discount: (json['discount']?.toString() ?? '0'),
         discountType: (json['discount_type'] as String?) ?? 'percent',
@@ -19,16 +19,26 @@ class ProductModel extends ProductEntity {
           json['discount']?.toString() ?? '0',
           (json['discount_type'] as String?) ?? 'percent',
         ),
-        images: ProductImages.fromJson(json['images']),
-        image: json['image'] ?? '',
+        images: json['images'] != null
+            ? ProductImages.fromJson(json['images'])
+            : ProductImages(urls: []),
+        image: json['image'] as String? ?? '',
         category: json['category'] == null
             ? null
             : CategoryModel.fromJson(json['category']),
         attributes:
             (json['attributes'] as List<dynamic>?)
                 ?.map(
-                  (e) =>
-                      ProductAttributeModel.fromJson(e as Map<String, dynamic>),
+                  (e) => e != null
+                      ? ProductAttributeModel.fromJson(
+                          e as Map<String, dynamic>,
+                        )
+                      : ProductAttributeModel(
+                          id: 0,
+                          name: '',
+                          value: '',
+                          type: '',
+                        ),
                 )
                 .toList() ??
             [],
@@ -47,18 +57,25 @@ class ProductModel extends ProductEntity {
     String discountStr,
     String discountType,
   ) {
-    final price = double.tryParse(priceStr) ?? 0;
-    final discount = double.tryParse(discountStr) ?? 0;
+    try {
+      final price = double.tryParse(priceStr) ?? 0;
+      final discount = double.tryParse(discountStr) ?? 0;
 
-    double discounted = price;
-    if (discount > 0) {
-      if (discountType == 'percent') {
-        discounted = price - (price * discount / 100);
-      } else if (discountType == 'fixed') {
-        discounted = price - discount;
+      if (price <= 0) return '0';
+
+      double discounted = price;
+      if (discount > 0) {
+        if (discountType == 'percent') {
+          discounted = price - (price * discount / 100);
+        } else if (discountType == 'fixed') {
+          discounted = price - discount;
+          if (discounted < 0) discounted = 0;
+        }
       }
-    }
 
-    return discounted.toStringAsFixed(0); // تبدیل به String بدون اعشار
+      return discounted.toStringAsFixed(0);
+    } catch (e) {
+      return '0';
+    }
   }
 }

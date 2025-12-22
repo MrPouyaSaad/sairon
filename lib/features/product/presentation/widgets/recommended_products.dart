@@ -14,24 +14,24 @@ class RecommendedProducts extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          RecommendedProductBloc(ProductUseCases(productRepository))
+          ProductBloc(ProductUseCases(productRepository))
             ..add(FetchRecommendedProducts(productId: id)),
       child: Builder(
         builder: (context) {
-          return BlocBuilder<RecommendedProductBloc, ProductState>(
+          return BlocBuilder<ProductBloc, ProductState>(
             builder: (context, state) {
-              if (state is FetchRecommendedProductsLoading) {
+              if (state is FetchProductsLoading) {
                 return ScreenLoadingIndicator();
-              } else if (state is FetchRecommendedProductsError) {
+              } else if (state is FetchProductsError) {
                 return AppErrorWidget(
                   message: state.message,
                   onRetry: () {
-                    BlocProvider.of<RecommendedProductBloc>(
+                    BlocProvider.of<ProductBloc>(
                       context,
                     ).add(FetchRecommendedProducts(productId: id));
                   },
                 );
-              } else if (state is FetchRecommendedProductsSuccess) {
+              } else if (state is FetchProductsSuccess) {
                 return state.products!.isEmpty
                     ? SizedBox()
                     : ProductHorizontalList(

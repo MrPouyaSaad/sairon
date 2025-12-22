@@ -90,15 +90,16 @@ class GetPaymentToken extends OrderEvent {
   final String orderId;
   final double amount;
   final String phone;
-
+  final String redirectUrl;
   GetPaymentToken({
     required this.orderId,
     required this.amount,
     required this.phone,
+    required this.redirectUrl,
   });
 
   @override
-  List<Object?> get props => [orderId, amount, phone];
+  List<Object?> get props => [orderId, amount, phone, redirectUrl];
 }
 
 // Verify Payment

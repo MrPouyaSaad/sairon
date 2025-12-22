@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sairon/core/errors/exception_helper.dart';
 import 'package:sairon/features/order/domain/usecases/order_usecases.dart';
 import 'package:sairon/features/order/data/models/order_model.dart';
-import 'package:sairon/features/cart/data/model/shipping_info_model.dart';
+
+import '../../data/models/order_preview_model.dart';
 
 part 'order_event.dart';
 part 'order_state.dart';
@@ -11,7 +12,7 @@ part 'order_state.dart';
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
   final OrderUseCases useCases;
 
-  OrderBloc(this.useCases) : super(OrderInitial()) {
+  OrderBloc(this.useCases) : super(OrderLoading()) {
     on<OrderEvent>((event, emit) async {
       emit(OrderLoading());
 
@@ -56,11 +57,10 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
 
         emit(OrderCancelled());
       } else if (event is CalculateShipping) {
-        final result = await useCases.calculateShipping(
+        emit(OrderLoading());
+        final result = await useCases.calculateOrderPreview(
           province: event.province,
           city: event.city,
-          subtotal: event.subtotal,
-          shippingMethod: event.shippingMethod,
         );
 
         final failure = extractLeft(result);
@@ -72,6 +72,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
           orderId: event.orderId,
           amount: event.amount,
           phone: event.phone,
+          redirectUrl: event.redirectUrl,
         );
 
         final failure = extractLeft(result);

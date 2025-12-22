@@ -1,8 +1,9 @@
 import 'package:dartz/dartz.dart';
-import 'package:sairon/features/cart/data/model/shipping_info_model.dart';
 import 'package:sairon/features/order/domain/repositories/order_repo.dart';
 import '../../../../core/errors/failures.dart';
+import '../../data/models/cart_validation_model.dart';
 import '../../data/models/order_model.dart';
+import '../../data/models/order_preview_model.dart';
 
 class OrderUseCases {
   final OrderRepository repository;
@@ -45,47 +46,28 @@ class OrderUseCases {
     return repository.cancelOrder(orderId);
   }
 
-  Future<Either<Failure, ShippingInfoModel>> calculateShipping({
-    required String province,
-    required String city,
-    double subtotal = 0,
-    String shippingMethod = 'standard',
-  }) {
-    return repository.calculateShipping(
-      province: province,
-      city: city,
-      subtotal: subtotal,
-      shippingMethod: shippingMethod,
-    );
+  Future<Either<Failure, CartValidationModel>> validateCart() {
+    return repository.validateCart();
   }
 
-  // Future<Either<Failure, OrderStatsModel>> fetchOrderStats() {
-  //   return repository.fetchOrderStats();
-  // }
-
-  // Future<Either<Failure, OrderPreviewModel>> validateCart() {
-  //   return repository.validateCart();
-  // }
-
-  // Future<Either<Failure, OrderPreviewModel>> calculateOrderPreview({
-  //   String? province,
-  //   String? city,
-  // }) {
-  //   return repository.calculateOrderPreview(
-  //     province: province,
-  //     city: city,
-  //   );
-  // }
+  Future<Either<Failure, OrderPreviewModel>> calculateOrderPreview({
+    required String province,
+    required String city,
+  }) {
+    return repository.calculateOrderPreview(province: province, city: city);
+  }
 
   Future<Either<Failure, Map<String, dynamic>>> getPaymentToken({
     required String orderId,
     required double amount,
     required String phone,
+    required String redirectUrl,
   }) {
     return repository.getPaymentToken(
       orderId: orderId,
       amount: amount,
       phone: phone,
+      redirectUrl: redirectUrl,
     );
   }
 

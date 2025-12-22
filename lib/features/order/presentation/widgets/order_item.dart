@@ -240,7 +240,7 @@ class _OrderItemWidgetState extends State<OrderItemWidget> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
               ],
             ),
           ),

@@ -7,21 +7,21 @@ abstract class ProductState extends Equatable {
   List<Object> get props => [];
 }
 
-final class FetchRecommendedProductsSuccess extends ProductState {
+final class FetchProductsSuccess extends ProductState {
   final List<ProductEntity>? products;
 
-  const FetchRecommendedProductsSuccess({required this.products});
+  const FetchProductsSuccess({required this.products});
 
   @override
   List<Object> get props => [];
 }
 
-final class FetchRecommendedProductsLoading extends ProductState {}
+final class FetchProductsLoading extends ProductState {}
 
-final class FetchRecommendedProductsError extends ProductState {
+final class FetchProductsError extends ProductState {
   final String message;
 
-  const FetchRecommendedProductsError({required this.message});
+  const FetchProductsError({required this.message});
   @override
   List<Object> get props => [message];
 }
