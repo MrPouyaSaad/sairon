@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sairon/features/product/domain/entities/product_entity.dart';
+import 'package:sairon/features/product/presentation/widgets/empty_productslist.dart';
 import 'package:sairon/features/product/presentation/widgets/horizontal_product_card.dart';
 
 class ProductVerticalList extends StatelessWidget {
@@ -8,12 +9,14 @@ class ProductVerticalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          return HorizontalProductCard(productEntity: products[index]);
-        },
-      ),
+      body: products.isEmpty
+          ? EmptyProductsList()
+          : ListView.builder(
+              itemCount: products.length,
+              itemBuilder: (context, index) {
+                return HorizontalProductCard(productEntity: products[index]);
+              },
+            ),
     );
   }
 }
