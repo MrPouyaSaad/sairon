@@ -1,32 +1,36 @@
 part of 'order_bloc.dart';
 
 abstract class OrderEvent extends Equatable {
+  const OrderEvent();
+
   @override
   List<Object?> get props => [];
 }
 
-// Fetch Orders
+// ================= Orders =================
+
 class FetchOrders extends OrderEvent {
   final String? status;
   final int page;
   final int limit;
 
-  FetchOrders({this.status, this.page = 1, this.limit = 10});
+  const FetchOrders({this.status, this.page = 1, this.limit = 10});
 
   @override
   List<Object?> get props => [status, page, limit];
 }
 
-// Fetch Order Details
 class FetchOrderDetails extends OrderEvent {
   final String orderId;
-  FetchOrderDetails(this.orderId);
+
+  const FetchOrderDetails(this.orderId);
 
   @override
   List<Object?> get props => [orderId];
 }
 
-// Create Order
+// ================= Order Actions =================
+
 class CreateOrder extends OrderEvent {
   final String firstName;
   final String lastName;
@@ -36,7 +40,7 @@ class CreateOrder extends OrderEvent {
   final String address;
   final String? postalCode;
 
-  CreateOrder({
+  const CreateOrder({
     required this.firstName,
     required this.lastName,
     required this.phone,
@@ -58,40 +62,36 @@ class CreateOrder extends OrderEvent {
   ];
 }
 
-// Cancel Order
 class CancelOrder extends OrderEvent {
   final String orderId;
-  CancelOrder(this.orderId);
+
+  const CancelOrder(this.orderId);
 
   @override
   List<Object?> get props => [orderId];
 }
 
-// Calculate shipping
+// ================= Shipping =================
+
 class CalculateShipping extends OrderEvent {
   final String province;
   final String city;
-  final double subtotal;
-  final String shippingMethod;
 
-  CalculateShipping({
-    required this.province,
-    required this.city,
-    this.subtotal = 0,
-    this.shippingMethod = 'standard',
-  });
+  const CalculateShipping({required this.province, required this.city});
 
   @override
-  List<Object?> get props => [province, city, subtotal, shippingMethod];
+  List<Object?> get props => [province, city];
 }
 
-// Payment token
+// ================= Payment =================
+
 class GetPaymentToken extends OrderEvent {
   final String orderId;
   final double amount;
   final String phone;
   final String redirectUrl;
-  GetPaymentToken({
+
+  const GetPaymentToken({
     required this.orderId,
     required this.amount,
     required this.phone,
@@ -102,18 +102,11 @@ class GetPaymentToken extends OrderEvent {
   List<Object?> get props => [orderId, amount, phone, redirectUrl];
 }
 
-// Verify Payment
-class VerifyPayment extends OrderEvent {
+class CheckPaymentStatus extends OrderEvent {
   final String orderId;
-  final String transactionId;
-  final String referenceId;
 
-  VerifyPayment({
-    required this.orderId,
-    required this.transactionId,
-    required this.referenceId,
-  });
+  const CheckPaymentStatus(this.orderId);
 
   @override
-  List<Object?> get props => [orderId, transactionId, referenceId];
+  List<Object?> get props => [orderId];
 }

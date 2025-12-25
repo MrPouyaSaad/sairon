@@ -18,14 +18,6 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage> {
   int? expandedOrderId;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) => context.read<OrderBloc>().add(FetchOrders()),
-    );
-  }
-
   void _toggleOrder(int orderId) {
     setState(() {
       expandedOrderId = expandedOrderId == orderId ? null : orderId;

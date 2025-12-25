@@ -67,10 +67,14 @@ class CartPage extends StatelessWidget {
                                       const SizedBox(height: 16),
                                   itemBuilder: (context, index) {
                                     if (index == 0) {
-                                      return CartTotalWidget(cart: state.cart!);
+                                      return CartTotalWidget(
+                                        cart: value ?? state.cart!,
+                                      );
                                     } else {
                                       return CartItemList(
-                                        items: state.cart!.items,
+                                        items: value != null
+                                            ? value.items
+                                            : state.cart!.items,
                                       );
                                     }
                                   },

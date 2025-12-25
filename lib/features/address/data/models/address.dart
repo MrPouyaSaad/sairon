@@ -16,12 +16,12 @@ class AddressModel extends AddressEntity {
     : super(
         id: json['id'] ?? 0,
         title: json['title'] ?? 'بدون عنوان',
-        receiver: json['receiver'],
-        phoneNumber: json['phone'],
-        province: json['province'],
-        city: json['city'],
-        address: json['address'],
-        postalCode: json['postalCode'],
+        receiver: json['receiver'] ?? '',
+        phoneNumber: json['phone'] ?? '',
+        province: json['province'] ?? '',
+        city: json['city'] ?? '',
+        address: json['address'] ?? '',
+        postalCode: json['postalCode'] ?? '',
         isDefault: json['isDefault'] ?? false,
       );
 }

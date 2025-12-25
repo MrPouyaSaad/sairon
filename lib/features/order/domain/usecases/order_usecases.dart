@@ -57,7 +57,7 @@ class OrderUseCases {
     return repository.calculateOrderPreview(province: province, city: city);
   }
 
-  Future<Either<Failure, Map<String, dynamic>>> getPaymentToken({
+  Future<Either<Failure, String>> getPaymentToken({
     required String orderId,
     required double amount,
     required String phone,
@@ -71,15 +71,10 @@ class OrderUseCases {
     );
   }
 
-  Future<Either<Failure, Map<String, dynamic>>> verifyPayment({
-    required String orderId,
-    required String transactionId,
-    required String referenceId,
-  }) {
-    return repository.verifyPayment(
-      orderId: orderId,
-      transactionId: transactionId,
-      referenceId: referenceId,
-    );
+  /// 🔥 تنها usecase پرداخت بعد از deeplink
+  Future<Either<Failure, Map<String, dynamic>>> checkPaymentStatus(
+    String orderId,
+  ) {
+    return repository.checkPaymentStatus(orderId);
   }
 }

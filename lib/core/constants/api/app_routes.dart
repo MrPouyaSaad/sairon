@@ -110,6 +110,8 @@ class PaymentRoutes {
   const PaymentRoutes();
 
   final String create = '/api/payments/create';
-  final String samanVerify = '/api/payments/saman/verify';
-  final String samanReverse = '/api/payments/saman/reverse';
+
+  String redirect(String orderId) => '/api/payments/redirect/$orderId';
+
+  String status(String orderId) => '/api/payments/status/$orderId';
 }

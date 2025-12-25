@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sairon/core/errors/exception_helper.dart';
 import 'package:sairon/features/order/domain/usecases/order_usecases.dart';
-import 'package:sairon/features/order/data/models/order_model.dart';
 
+import '../../data/models/order_model.dart';
 import '../../data/models/order_preview_model.dart';
 
 part 'order_event.dart';
@@ -12,85 +12,166 @@ part 'order_state.dart';
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
   final OrderUseCases useCases;
 
-  OrderBloc(this.useCases) : super(OrderLoading()) {
-    on<OrderEvent>((event, emit) async {
-      emit(OrderLoading());
+  OrderBloc(this.useCases) : super(OrderInitial()) {
+    on<FetchOrders>(_onFetchOrders);
+    on<FetchOrderDetails>(_onFetchOrderDetails);
+    on<CreateOrder>(_onCreateOrder);
+    on<CancelOrder>(_onCancelOrder);
+    on<CalculateShipping>(_onCalculateShipping);
+    on<GetPaymentToken>(_onGetPaymentToken);
+    on<CheckPaymentStatus>(_onCheckPaymentStatus);
+  }
 
-      if (event is FetchOrders) {
-        final result = await useCases.fetchOrders(
-          status: event.status,
-          page: event.page,
-          limit: event.limit,
-        );
+  // ================= Orders =================
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+  Future<void> _onFetchOrders(
+    FetchOrders event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(OrderLoading());
 
-        emit(OrdersLoaded(extractRight(result)));
-      } else if (event is FetchOrderDetails) {
-        final result = await useCases.fetchOrderDetails(event.orderId);
+    final result = await useCases.fetchOrders(
+      status: event.status,
+      page: event.page,
+      limit: event.limit,
+    );
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
 
-        emit(OrderDetailsLoaded(extractRight(result)));
-      } else if (event is CreateOrder) {
-        final result = await useCases.createOrder(
-          firstName: event.firstName,
-          lastName: event.lastName,
-          phone: event.phone,
-          province: event.province,
-          city: event.city,
-          address: event.address,
-          postalCode: event.postalCode,
-        );
+    emit(OrdersLoaded(extractRight(result)));
+  }
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+  Future<void> _onFetchOrderDetails(
+    FetchOrderDetails event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(OrderLoading());
 
-        emit(OrderCreated(extractRight(result)));
-      } else if (event is CancelOrder) {
-        final result = await useCases.cancelOrder(event.orderId);
+    final result = await useCases.fetchOrderDetails(event.orderId);
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
 
-        emit(OrderCancelled());
-      } else if (event is CalculateShipping) {
-        emit(OrderLoading());
-        final result = await useCases.calculateOrderPreview(
-          province: event.province,
-          city: event.city,
-        );
+    emit(OrderDetailsLoaded(extractRight(result)));
+  }
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+  // ================= Order Actions =================
 
-        emit(ShippingCalculated(extractRight(result)));
-      } else if (event is GetPaymentToken) {
-        final result = await useCases.getPaymentToken(
-          orderId: event.orderId,
-          amount: event.amount,
-          phone: event.phone,
-          redirectUrl: event.redirectUrl,
-        );
+  Future<void> _onCreateOrder(
+    CreateOrder event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(OrderLoading());
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+    final result = await useCases.createOrder(
+      firstName: event.firstName,
+      lastName: event.lastName,
+      phone: event.phone,
+      province: event.province,
+      city: event.city,
+      address: event.address,
+      postalCode: event.postalCode,
+    );
 
-        emit(PaymentTokenLoaded(extractRight(result)));
-      } else if (event is VerifyPayment) {
-        final result = await useCases.verifyPayment(
-          orderId: event.orderId,
-          transactionId: event.transactionId,
-          referenceId: event.referenceId,
-        );
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
 
-        final failure = extractLeft(result);
-        if (failure != null) return emit(OrderError(failure.message));
+    emit(OrderCreated(extractRight(result)));
+  }
 
-        emit(PaymentVerified(extractRight(result)));
-      }
-    });
+  Future<void> _onCancelOrder(
+    CancelOrder event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(OrderLoading());
+
+    final result = await useCases.cancelOrder(event.orderId);
+
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
+
+    emit(OrderCancelled());
+  }
+
+  // ================= Shipping =================
+
+  Future<void> _onCalculateShipping(
+    CalculateShipping event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(OrderLoading());
+
+    final result = await useCases.calculateOrderPreview(
+      province: event.province,
+      city: event.city,
+    );
+
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
+
+    emit(ShippingCalculated(extractRight(result)));
+  }
+
+  // ================= Payment =================
+
+  Future<void> _onGetPaymentToken(
+    GetPaymentToken event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(PaymentTokenLoading());
+
+    final result = await useCases.getPaymentToken(
+      orderId: event.orderId,
+      amount: event.amount,
+      phone: event.phone,
+      redirectUrl: event.redirectUrl,
+    );
+
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
+
+    emit(PaymentTokenLoaded(extractRight(result)));
+  }
+
+  Future<void> _onCheckPaymentStatus(
+    CheckPaymentStatus event,
+    Emitter<OrderState> emit,
+  ) async {
+    emit(PaymentChecking());
+
+    final result = await useCases.checkPaymentStatus(event.orderId);
+
+    final failure = extractLeft(result);
+    if (failure != null) {
+      emit(OrderError(failure.message));
+      return;
+    }
+
+    final data = extractRight(result);
+
+    if (data?['status'] == 'success') {
+      emit(PaymentSuccess(data));
+    } else {
+      emit(PaymentFailed(data?['status']));
+    }
   }
 }

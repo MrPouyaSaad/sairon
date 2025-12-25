@@ -14,6 +14,7 @@ import 'package:sairon/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:sairon/features/profile/presentation/pages/user_info_page.dart';
 import 'package:sairon/features/profile/presentation/widgets/profile_header.dart';
 import 'package:sairon/features/profile/presentation/widgets/profile_menu_item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -63,7 +64,7 @@ class ProfilePage extends StatelessWidget {
 
                         _buildSupportSection(),
 
-                        _buildLogoutSection(),
+                        _buildLogoutSection(context),
 
                         const SizedBox(height: 20),
                       ],
@@ -174,7 +175,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutSection() {
+  Widget _buildLogoutSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -214,7 +215,9 @@ class ProfilePage extends StatelessWidget {
                 color: Colors.red,
               ),
             ),
-            onTap: _logout,
+            onTap: () {
+              _logout(context);
+            },
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 8,
@@ -226,25 +229,50 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _navigateToAddresses() {
-    Get.to(AddressPage());
+    Get.to(AddressPage(isCheckout: false));
   }
 
   void _navigateToOrders() {
     Get.to(OrdersPage());
   }
 
-  void _contactSupport() {
-    // TODO: Contact support
-    print('پشتیبانی');
+  void _logout(BuildContext context) {
+    TokenRepository.logoutWithConfirmation(context);
   }
 
-  void _aboutUs() {
-    // TODO: Show about us dialog
-    print('درباره ما');
+  Future<void> _contactSupport() async {
+    try {
+      final Uri url = Uri.parse('https://saironstore.ir/contact');
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $url');
+      }
+    } catch (e) {
+      // Handle error (you can show a snackbar or dialog)
+      // print('Error launching support URL: $e');
+    }
   }
 
-  void _logout() {
-    // TODO: Show logout confirmation and logout
-    print('خروج از حساب کاربری');
+  Future<void> _aboutUs() async {
+    try {
+      final Uri url = Uri.parse('https://saironstore.ir/about');
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $url');
+      }
+    } catch (e) {
+      // Handle error
+      // print('Error launching about URL: $e');
+    }
+  }
+
+  // Optional: Combined function for any URL
+  Future<void> _launchUrl(String urlString) async {
+    try {
+      final Uri url = Uri.parse(urlString);
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $url');
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+    }
   }
 }

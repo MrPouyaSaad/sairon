@@ -46,20 +46,23 @@ class _ProductDetailsState extends State<ProductDetails> {
   }
 
   bool isInCart(CartState state) {
-    if (state is! CartLoaded) return false;
+    // if (state is! CartLoaded) return false;
 
-    return state.cart!.items.any(
-      (i) =>
-          i.product.id == widget.productEntity.id &&
-          i.variant?.id == selectedVariantId,
-    );
+    if (cartRepository.cartNotifier.value == null) {
+      return false;
+    } else {
+      return cartRepository.cartNotifier.value!.items.any(
+        (i) =>
+            i.product.id.toString() == widget.productEntity.id.toString() &&
+            (i.variant?.id ?? '').toString() ==
+                (selectedVariantId ?? '').toString(),
+      );
+    }
   }
 
-  void changeQty({required bool inc}) {
-    final cart = context.read<CartBloc>().state;
-    if (cart is! CartLoaded) return;
-
-    final item = cart.cart!.items.firstWhereOrNull(
+  void changeQty(BuildContext context, {required bool inc}) {
+    final cart = cartRepository.cartNotifier.value;
+    final item = cart!.items.firstWhereOrNull(
       (i) =>
           i.product.id == widget.productEntity.id &&
           i.variant?.id == selectedVariantId,
@@ -216,13 +219,10 @@ class _ProductDetailsState extends State<ProductDetails> {
         bottomNavigationBar: BlocBuilder<CartBloc, CartState>(
           builder: (context, state) {
             final isLoading = state is CartLoading;
-            final inCart = isInCart(state);
 
-            if (state is! CartLoaded || !inCart) {
-              return const SizedBox.shrink();
-            }
+            final cart = cartRepository.cartNotifier.value;
 
-            final item = state.cart!.items.firstWhereOrNull(
+            final item = cart!.items.firstWhereOrNull(
               (i) =>
                   i.product.id == widget.productEntity.id &&
                   i.variant?.id == selectedVariantId,
@@ -259,7 +259,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         children: [
                           if (!isLoading) ...[
                             GestureDetector(
-                              onTap: () => changeQty(inc: true),
+                              onTap: () => changeQty(context, inc: true),
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: const BoxDecoration(
@@ -283,7 +283,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                             ),
                             const Gap(16),
                             GestureDetector(
-                              onTap: () => changeQty(inc: false),
+                              onTap: () => changeQty(context, inc: false),
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(

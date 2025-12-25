@@ -22,14 +22,14 @@ class OrderRepositoryImpl implements OrderRepository {
     String? status,
     int page = 1,
     int limit = 10,
-  }) async {
+  }) {
     return safeCall(
       () => dataSource.fetchOrders(status: status, page: page, limit: limit),
     );
   }
 
   @override
-  Future<Either<Failure, OrderModel>> fetchOrderDetails(String orderId) async {
+  Future<Either<Failure, OrderModel>> fetchOrderDetails(String orderId) {
     return safeCall(() => dataSource.fetchOrderDetails(orderId));
   }
 
@@ -42,7 +42,7 @@ class OrderRepositoryImpl implements OrderRepository {
     required String city,
     required String address,
     String? postalCode,
-  }) async {
+  }) {
     return safeCall(
       () => dataSource.createOrder(
         firstName: firstName,
@@ -57,12 +57,12 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Future<Either<Failure, void>> cancelOrder(String orderId) async {
+  Future<Either<Failure, void>> cancelOrder(String orderId) {
     return safeCall(() => dataSource.cancelOrder(orderId));
   }
 
   @override
-  Future<Either<Failure, CartValidationModel>> validateCart() async {
+  Future<Either<Failure, CartValidationModel>> validateCart() {
     return safeCall(() => dataSource.validateCart());
   }
 
@@ -70,21 +70,21 @@ class OrderRepositoryImpl implements OrderRepository {
   Future<Either<Failure, OrderPreviewModel>> calculateOrderPreview({
     required String province,
     required String city,
-  }) async {
+  }) {
     return safeCall(
       () => dataSource.calculateOrderPreview(province: province, city: city),
     );
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> getPaymentToken({
+  Future<Either<Failure, String>> getPaymentToken({
     required String orderId,
     required double amount,
     required String phone,
     required String redirectUrl,
-  }) async {
+  }) {
     return safeCall(
-      () => dataSource.getPaymentToken(
+      () => dataSource.initPay(
         orderId: orderId,
         amount: amount,
         phone: phone,
@@ -94,17 +94,9 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> verifyPayment({
-    required String orderId,
-    required String transactionId,
-    required String referenceId,
-  }) async {
-    return safeCall(
-      () => dataSource.verifyPayment(
-        orderId: orderId,
-        transactionId: transactionId,
-        referenceId: referenceId,
-      ),
-    );
+  Future<Either<Failure, Map<String, dynamic>>> checkPaymentStatus(
+    String orderId,
+  ) {
+    return safeCall(() => dataSource.checkPaymentStatus(orderId));
   }
 }

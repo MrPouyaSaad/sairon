@@ -11,7 +11,9 @@ abstract class OrderRemoteDataSource {
     int page = 1,
     int limit = 10,
   });
+
   Future<OrderModel> fetchOrderDetails(String orderId);
+
   Future<OrderModel> createOrder({
     required String firstName,
     required String lastName,
@@ -21,24 +23,24 @@ abstract class OrderRemoteDataSource {
     required String address,
     String? postalCode,
   });
+
   Future<void> cancelOrder(String orderId);
+
   Future<CartValidationModel> validateCart();
+
   Future<OrderPreviewModel> calculateOrderPreview({
     required String province,
     required String city,
   });
 
-  Future<Map<String, dynamic>> getPaymentToken({
+  Future<String> initPay({
     required String orderId,
     required double amount,
     required String phone,
     required String redirectUrl,
   });
-  Future<Map<String, dynamic>> verifyPayment({
-    required String orderId,
-    required String transactionId,
-    required String referenceId,
-  });
+
+  Future<Map<String, dynamic>> checkPaymentStatus(String orderId);
 }
 
 class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
@@ -120,42 +122,18 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> getPaymentToken({
+  Future<String> initPay({
     required String orderId,
     required double amount,
     required String phone,
     required String redirectUrl,
   }) async {
-    final res = await httpClient.post(
-      AppRoutes.payment.create,
-      data: {
-        'orderId': orderId,
-        'amount': amount,
-        'phone': phone,
-        redirectUrl: "sairon://payment-result",
-      },
-    );
-
-    if (res.headers.value('content-type')?.contains('text/html') == true) {
-      return {'html': res.data, 'paymentUrl': null, 'token': null};
-    }
-    return res.data['data'];
+    return AppRoutes.payment.redirect(orderId);
   }
 
   @override
-  Future<Map<String, dynamic>> verifyPayment({
-    required String orderId,
-    required String transactionId,
-    required String referenceId,
-  }) async {
-    final res = await httpClient.post(
-      AppRoutes.payment.samanVerify,
-      data: {
-        'orderId': orderId,
-        'transactionId': transactionId,
-        'referenceId': referenceId,
-      },
-    );
+  Future<Map<String, dynamic>> checkPaymentStatus(String orderId) async {
+    final res = await httpClient.get(AppRoutes.payment.status(orderId));
     return res.data['data'];
   }
 }

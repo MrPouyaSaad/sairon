@@ -32,16 +32,14 @@ abstract class OrderRepository {
     required String city,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> getPaymentToken({
+  Future<Either<Failure, String>> getPaymentToken({
     required String orderId,
     required double amount,
     required String phone,
     required String redirectUrl,
   });
 
-  Future<Either<Failure, Map<String, dynamic>>> verifyPayment({
-    required String orderId,
-    required String transactionId,
-    required String referenceId,
-  });
+  Future<Either<Failure, Map<String, dynamic>>> checkPaymentStatus(
+    String orderId,
+  );
 }

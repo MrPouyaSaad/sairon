@@ -114,88 +114,96 @@ class _AddressPageState extends State<AddressPage> {
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: BlocBuilder<AddressBloc, AddressState>(
-          buildWhen: (previous, current) =>
-              previous.addresses != current.addresses,
-          builder: (context, state) {
-            AddressEntity? selectedAddress;
+        floatingActionButton: !widget.isCheckout
+            ? null
+            : BlocBuilder<AddressBloc, AddressState>(
+                buildWhen: (previous, current) =>
+                    previous.addresses != current.addresses,
+                builder: (context, state) {
+                  AddressEntity? selectedAddress;
 
-            if (_selectedAddressId != null) {
-              selectedAddress = state.addresses.firstWhere(
-                (address) => address.id.toString() == _selectedAddressId,
-                orElse: () => state.addresses.firstWhere(
-                  (address) => address.isDefault,
-                  orElse: () => state.addresses.first,
-                ),
-              );
-            } else if (state.addresses.isNotEmpty) {
-              selectedAddress = state.addresses.firstWhere(
-                (address) => address.isDefault,
-                orElse: () => state.addresses.first,
-              );
-            }
+                  if (_selectedAddressId != null) {
+                    selectedAddress = state.addresses.firstWhere(
+                      (address) => address.id.toString() == _selectedAddressId,
+                      orElse: () => state.addresses.firstWhere(
+                        (address) => address.isDefault,
+                        orElse: () => state.addresses.first,
+                      ),
+                    );
+                  } else if (state.addresses.isNotEmpty) {
+                    selectedAddress = state.addresses.firstWhere(
+                      (address) => address.isDefault,
+                      orElse: () => state.addresses.first,
+                    );
+                  }
 
-            return Row(
-              children: [
-                FloatingActionButton(
-                  backgroundColor: AppColors.backgroundColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: Constants.primaryRadius,
-                    side: BorderSide(width: 2, color: AppColors.primaryColor),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: AppColors.primaryColor,
-                    size: 26,
-                  ),
-                ),
-                Gap(16),
-                Expanded(
-                  child: FloatingActionButton(
-                    onPressed: selectedAddress == null
-                        ? () {
-                            log('Selected address is null');
-                            Get.showSnackbar(
-                              GetSnackBar(
-                                message: 'لطفاً یک آدرس را انتخاب کنید',
-                                duration: Duration(seconds: 2),
-                                snackPosition: SnackPosition.TOP,
-                                backgroundColor: Colors.red,
-                                borderRadius: 10,
-                                margin: EdgeInsets.all(10),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 14,
-                                ),
-                              ),
-                            );
-                          }
-                        : () {
-                            log('Selected address: ${selectedAddress?.id}');
-                            Navigator.of(
-                              context,
-                            ).pushNamed('/payment', arguments: selectedAddress);
-                          },
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'ادامه خرید',
-                            textAlign: TextAlign.center,
+                  return Row(
+                    children: [
+                      FloatingActionButton(
+                        backgroundColor: AppColors.backgroundColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: Constants.primaryRadius,
+                          side: BorderSide(
+                            width: 2,
+                            color: AppColors.primaryColor,
                           ),
                         ),
-                        Icon(Icons.arrow_forward, size: 26),
-                      ],
-                    ).paddingSymmetric(horizontal: 12),
-                  ),
-                ),
-              ],
-            ).marginSymmetric(horizontal: 16);
-          },
-        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: AppColors.primaryColor,
+                          size: 26,
+                        ),
+                      ),
+                      Gap(16),
+                      Expanded(
+                        child: FloatingActionButton(
+                          onPressed: selectedAddress == null
+                              ? () {
+                                  log('Selected address is null');
+                                  Get.showSnackbar(
+                                    GetSnackBar(
+                                      message: 'لطفاً یک آدرس را انتخاب کنید',
+                                      duration: Duration(seconds: 2),
+                                      snackPosition: SnackPosition.TOP,
+                                      backgroundColor: Colors.red,
+                                      borderRadius: 10,
+                                      margin: EdgeInsets.all(10),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 14,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              : () {
+                                  log(
+                                    'Selected address: ${selectedAddress?.id}',
+                                  );
+                                  Navigator.of(context).pushNamed(
+                                    '/payment',
+                                    arguments: selectedAddress,
+                                  );
+                                },
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'ادامه خرید',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Icon(Icons.arrow_forward, size: 26),
+                            ],
+                          ).paddingSymmetric(horizontal: 12),
+                        ),
+                      ),
+                    ],
+                  ).marginSymmetric(horizontal: 16);
+                },
+              ),
       ),
     );
   }
@@ -272,7 +280,7 @@ class _AddressPageState extends State<AddressPage> {
                         address: address,
                         isLoading: isWorking,
                         isCheckout: isCheckout,
-                        isSelected: isSelected,
+                        isSelected: widget.isCheckout ? isSelected : false,
                         onEdit: () => _editAddress(address, context),
                         onDelete: () => context.read<AddressBloc>().add(
                           RemoveAddress(addressId: address.id.toString()),
