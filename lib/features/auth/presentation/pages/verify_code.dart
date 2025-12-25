@@ -27,7 +27,7 @@ class _VerifyCodeState extends State<VerifyCode> {
   final int codeLength = 5;
   late final List<TextEditingController> _controllers;
   late final List<FocusNode> _focusNodes;
-  String _currentCode = '';
+  String currentCode = '';
 
   @override
   void initState() {
@@ -117,7 +117,7 @@ class _VerifyCodeState extends State<VerifyCode> {
                               CodeInputField(
                                 controllers: _controllers,
                                 focusNodes: _focusNodes,
-                                onCodeChanged: (code) => _currentCode = code,
+                                onCodeChanged: (code) => currentCode = code,
                               ),
 
                               state is AuthSendCodeLaoding

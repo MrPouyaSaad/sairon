@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
@@ -265,14 +267,14 @@ class ProfilePage extends StatelessWidget {
   }
 
   // Optional: Combined function for any URL
-  Future<void> _launchUrl(String urlString) async {
+  Future<void> urlLaunch(String urlString) async {
     try {
       final Uri url = Uri.parse(urlString);
       if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
         throw Exception('Could not launch $url');
       }
     } catch (e) {
-      print('Error launching URL: $e');
+      log('Error launching URL: $e');
     }
   }
 }

@@ -60,7 +60,6 @@ class CartDataSourceImpl implements CartDataSource {
 
   @override
   Future<int> getCartTotal() {
-    // TODO: implement getCartTotal
     throw UnimplementedError();
   }
 

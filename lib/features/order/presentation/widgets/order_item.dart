@@ -99,7 +99,6 @@ class _OrderItemWidgetState extends State<OrderItemWidget> {
   Widget build(BuildContext context) {
     final order = widget.order;
     final info = _getStatusInfo(order.status);
-    final theme = Theme.of(context);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

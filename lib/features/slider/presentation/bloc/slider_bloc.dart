@@ -6,8 +6,6 @@ part 'slider_state.dart';
 
 class SliderBloc extends Bloc<SliderEvent, SliderState> {
   SliderBloc() : super(SliderInitial()) {
-    on<SliderEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+    on<SliderEvent>((event, emit) {});
   }
 }
