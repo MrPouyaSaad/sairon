@@ -216,134 +216,151 @@ class _ProductDetailsState extends State<ProductDetails> {
           },
         ),
 
-        bottomNavigationBar: BlocBuilder<CartBloc, CartState>(
-          builder: (context, state) {
-            final isLoading = state is CartLoading;
+        bottomNavigationBar: ValueListenableBuilder(
+          valueListenable: cartRepository.cartNotifier,
+          builder: (context, value, child) {
+            return value == null
+                ? SizedBox()
+                : BlocBuilder<CartBloc, CartState>(
+                    builder: (context, state) {
+                      final isLoading = state is CartLoading;
 
-            final cart = cartRepository.cartNotifier.value;
+                      final cart = cartRepository.cartNotifier.value;
 
-            final item = cart!.items.firstWhereOrNull(
-              (i) =>
-                  i.product.id == widget.productEntity.id &&
-                  i.variant?.id == selectedVariantId,
-            );
+                      final item = cart?.items.firstWhereOrNull(
+                        (i) =>
+                            i.product.id == widget.productEntity.id &&
+                            i.variant?.id == selectedVariantId,
+                      );
 
-            if (item == null) {
-              return const SizedBox.shrink();
-            }
+                      if (item == null) {
+                        return const SizedBox.shrink();
+                      }
 
-            final count = item.quantity;
+                      final count = item.quantity;
 
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, anim) => SizeTransition(
-                sizeFactor: anim,
-                axisAlignment: -1,
-                child: child,
-              ),
-              child: BottomAppBar(
-                key: const ValueKey('cartBar'),
-                elevation: 12,
-                color: Theme.of(context).colorScheme.surface,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          if (!isLoading) ...[
-                            GestureDetector(
-                              onTap: () => changeQty(context, inc: true),
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: AppColors.textPrimary,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Iconsax.add,
-                                  color: Colors.white,
-                                  size: 22,
-                                ),
-                              ),
+                      return AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, anim) => SizeTransition(
+                          sizeFactor: anim,
+                          axisAlignment: -1,
+                          child: child,
+                        ),
+                        child: BottomAppBar(
+                          key: const ValueKey('cartBar'),
+                          elevation: 12,
+                          color: Theme.of(context).colorScheme.surface,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
                             ),
-                            const Gap(16),
-                            Text(
-                              '$count',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const Gap(16),
-                            GestureDetector(
-                              onTap: () => changeQty(context, inc: false),
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: count > 1
-                                      ? AppColors.textSecondary
-                                      : Colors.red,
-                                  shape: BoxShape.circle,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    if (!isLoading) ...[
+                                      GestureDetector(
+                                        onTap: () =>
+                                            changeQty(context, inc: true),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.textPrimary,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Iconsax.add,
+                                            color: Colors.white,
+                                            size: 22,
+                                          ),
+                                        ),
+                                      ),
+                                      const Gap(16),
+                                      Text(
+                                        '$count',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const Gap(16),
+                                      GestureDetector(
+                                        onTap: () =>
+                                            changeQty(context, inc: false),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: count > 1
+                                                ? AppColors.textSecondary
+                                                : Colors.red,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            count > 1
+                                                ? Iconsax.minus
+                                                : Iconsax.trash,
+                                            color: Colors.white,
+                                            size: 22,
+                                          ),
+                                        ),
+                                      ),
+                                    ] else
+                                      SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                              ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                                child: Icon(
-                                  count > 1 ? Iconsax.minus : Iconsax.trash,
-                                  color: Colors.white,
-                                  size: 22,
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    if (discountPercent > 0)
+                                      Text(
+                                        originalPrice
+                                            .toString()
+                                            .formattedStringPrice,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                    const Gap(8),
+                                    Text(
+                                      (discountedPrice * count)
+                                          .toString()
+                                          .formattedStringPrice
+                                          .withPriceLable,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ),
-                          ] else
-                            SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          if (discountPercent > 0)
-                            Text(
-                              originalPrice.toString().formattedStringPrice,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                          const Gap(8),
-                          Text(
-                            (discountedPrice * count)
-                                .toString()
-                                .formattedStringPrice
-                                .withPriceLable,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primaryColor,
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+                        ),
+                      );
+                    },
+                  );
           },
         ),
       ),
