@@ -1,41 +1,148 @@
-# 🛍️ Sairon - فروشگاه آنلاین
+# 🛍️ Sairon - Production E-commerce Application
 
 <div align="center">
 
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-![GetX](https://img.shields.io/badge/GetX-8A2BE2?style=for-the-badge)
-![BLoC](https://img.shields.io/badge/BLoC-02569B?style=for-the-badge)
+![BLoC](https://img.shields.io/badge/State_Management-BLoC-02569B?style=for-the-badge)
+![Architecture](https://img.shields.io/badge/Architecture-Clean_Architecture-6DB33F?style=for-the-badge)
 
-**اپلیکیشن موبایل فروشگاه آنلاین سایرون با معماری مدرن و کارایی بالا**
+**A scalable and production-ready mobile e-commerce application built with Flutter.**
 
-[🌐 وبسایت](https://saironstore.ir/) • [📱 اپلیکیشن](#) • [🐛 گزارش مشکل](https://github.com/your-username/sairon/issues)
-
-<img src="https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=Sairon+Mobile+App" alt="Sairon App Preview" width="800"/>
+[🌐 Website](https://saironstore.ir/) • 
+[📱 Cafebazaar](https://cafebazaar.ir/app/ir.saironstore.app) • 
+[📲 Myket](https://myket.ir/app/ir.saironstore.app)
 
 </div>
 
-## ✨ ویژگی‌های اصلی
+---
 
-### 🎯 معماری و تکنولوژی
-- **🧩 معماری BLoC + GetX** برای مدیریت state پیشرفته
-- **📱 Clean Architecture** با لایه‌های مجزا
-- **🎭 State Management ترکیبی** برای بهترین عملکرد
-- **🌐 REST API Integration** با Dio
-- **💾 Local Storage** با Hive و Shared Preferences
+## 📌 Overview
 
-### 🎨 طراحی و UX
-- **📐 طراحی مدرن Material 3** با پشتیبانی از Dark/Light Theme
-- **🎪 انیمیشن‌های روان** و تجربه کاربری عالی
-- **📱 ریسپانسیو** برای تمام دستگاه‌های موبایل
-- **⚡ عملکرد بالا** با Lazy Loading و Optimization
+Sairon is a real-world e-commerce application developed with a focus on scalability, maintainability, and performance.  
+The project follows Clean Architecture principles and uses BLoC for predictable state management.
 
-### 🛒 امکانات فروشگاه
-- **🔍 جستجوی پیشرفته** محصولات
-- **🛍️ سبد خرید** هوشمند و Real-time
-- **❤️ لیست علاقه‌مندی‌ها**
-- **📦 پیگیری سفارشات**
-- **💬 سیستم نظرات و امتیازدهی**
-- **🎯 پیشنهادات شخصی‌سازی شده**
+This repository represents a production-grade mobile commerce solution including authentication, cart management, order flow, and push notifications.
 
-## 🏗️ ساختار پروژه
+---
+
+## 🏗 Architecture
+
+The project follows **Clean Architecture** with strict layer separation:
+
+```
+lib/
+ ├── core/
+ ├── features/
+ │    ├── auth/
+ │    ├── home/
+ │    ├── cart/
+ │    ├── product/
+ │    └── profile/
+ └── main.dart
+```
+
+### Layers
+
+- **Presentation Layer**
+  - UI (Widgets)
+  - BLoC / Cubit
+- **Domain Layer**
+  - Entities
+  - UseCases
+  - Repository contracts
+- **Data Layer**
+  - Models
+  - Repository implementations
+  - Remote & Local data sources
+
+This structure ensures:
+- High testability
+- Low coupling
+- Clear separation of concerns
+- Easy feature scaling
+
+---
+
+## 🛠 Tech Stack
+
+| Category | Technologies |
+|----------|-------------|
+| Framework | Flutter |
+| Language | Dart |
+| State Management | BLoC / Cubit |
+| Networking | Dio (REST API) |
+| Architecture | Clean Architecture |
+| Local Storage | Hive, Shared Preferences |
+| Notifications | Firebase Cloud Messaging |
+| Dependency Injection | get_it |
+| Design | Material 3 |
+
+---
+
+## 🚀 Core Features
+
+- JWT Authentication (Login / Register)
+- Product Listing with Pagination
+- Advanced Product Search
+- Persistent Shopping Cart
+- Wishlist Management
+- Order Submission Flow
+- Push Notifications (FCM)
+- Dark / Light Theme Support
+
+---
+
+## 📸 Screenshots
+
+> Add real screenshots here for better portfolio presentation.
+
+```
+assets/screenshots/home.png
+assets/screenshots/product.png
+assets/screenshots/cart.png
+```
+
+---
+
+## ⚙️ Getting Started
+
+### Prerequisites
+
+- Flutter SDK >= 3.0.0
+- Dart SDK >= 3.0.0
+
+### Installation
+
+```bash
+git clone https://github.com/MrPouyaSaad/sairon.git
+cd sairon
+flutter pub get
+flutter run
+```
+
+---
+
+## 🎯 Why This Project Matters
+
+This project demonstrates:
+
+- Real-world API integration
+- Production-level architecture
+- Scalable feature-based structure
+- Clean separation of business logic
+- Maintainable state management using BLoC
+
+---
+
+## 👨‍💻 Developer
+
+**Pouya Sadeghzadeh**  
+Flutter Developer  
+
+GitHub: https://github.com/MrPouyaSaad  
+Email: Mr.PouyaSadeghzadeh@gmail.com  
+
+---
+
+© 2025 Sairon
