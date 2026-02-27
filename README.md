@@ -11,7 +11,6 @@
 
 [🌐 Website](https://saironstore.ir/) • 
 [📱 Cafebazaar](https://cafebazaar.ir/app/ir.saironstore.app) • 
-[📲 Myket](https://myket.ir/app/ir.saironstore.app)
 
 </div>
 
